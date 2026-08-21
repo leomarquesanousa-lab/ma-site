@@ -20,6 +20,7 @@ function WhatsAppIcon({
         d="M16.004 3C8.822 3 3 8.67 3 15.666C3 18.342 3.856 20.914 5.442 23.052L4 29L10.2 27.596C12.21 28.64 14.48 29.2 16.004 29.2C23.186 29.2 29 23.53 29 16.534C29 9.538 23.186 3 16.004 3Z"
         fill={white ? "white" : "#25D366"}
       />
+
       <path
         d="M23.03 19.58C22.75 19.44 21.38 18.77 21.13 18.68C20.88 18.58 20.7 18.54 20.52 18.82C20.34 19.09 19.83 19.68 19.68 19.85C19.53 20.02 19.38 20.04 19.1 19.9C18.82 19.76 17.93 19.47 16.87 18.54C16.05 17.82 15.5 16.93 15.34 16.65C15.19 16.38 15.32 16.23 15.45 16.1C15.57 15.99 15.73 15.81 15.87 15.64C16.01 15.47 16.05 15.35 16.14 15.17C16.23 14.99 16.19 14.84 16.12 14.7C16.05 14.56 15.49 13.2 15.25 12.64C15.01 12.1 14.77 12.18 14.59 12.17C14.42 12.16 14.23 12.16 14.05 12.16C13.87 12.16 13.58 12.23 13.34 12.49C13.11 12.76 12.44 13.38 12.44 14.65C12.44 15.91 13.37 17.14 13.5 17.31C13.64 17.48 15.31 20.11 17.87 21.19C20.43 22.28 20.43 21.91 21.14 21.85C21.85 21.79 23.39 21.2 23.69 20.34C23.98 19.48 23.98 18.76 23.9 18.64C23.81 18.52 23.63 18.47 23.35 18.33"
         fill={white ? "#25D366" : "white"}
@@ -52,12 +53,7 @@ function InstagramIcon() {
         fill="white"
       />
 
-      <circle
-        cx="22.3"
-        cy="9.7"
-        r="1.4"
-        fill="white"
-      />
+      <circle cx="22.3" cy="9.7" r="1.4" fill="white" />
 
       <defs>
         <linearGradient
@@ -88,12 +84,7 @@ function FacebookIcon() {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      <circle
-        cx="16"
-        cy="16"
-        r="13"
-        fill="#1877F2"
-      />
+      <circle cx="16" cy="16" r="13" fill="#1877F2" />
 
       <path
         d="M17.72 25V17.13H20.33L20.72 14.06H17.72V12.1C17.72 11.21 17.97 10.6 19.25 10.6H20.82V7.86C20.06 7.78 19.3 7.74 18.53 7.74C16.26 7.74 14.7 9.12 14.7 11.68V14.06H12.1V17.13H14.7V25H17.72Z"
@@ -143,19 +134,14 @@ function ProductCard({
   return (
     <article className="premium-card">
       <div className="premium-card-image">
-        <img
-          src={imageSrc}
-          alt={imageAlt}
-        />
+        <img src={imageSrc} alt={imageAlt} />
 
         <div className="premium-card-overlay" />
         <div className="gold-detail" />
       </div>
 
       <div className="premium-card-content">
-        <span className="card-eyebrow">
-          {eyebrow}
-        </span>
+        <span className="card-eyebrow">{eyebrow}</span>
 
         <h3>{title}</h3>
 
@@ -163,22 +149,15 @@ function ProductCard({
 
         <div className="premium-card-bottom">
           {href ? (
-            <a
-              href={href}
-              className="card-action"
-            >
+            <a href={href} className="card-action">
               Acessar
               <span>→</span>
             </a>
           ) : (
-            <span className="coming-soon">
-              Em breve
-            </span>
+            <span className="coming-soon">Em breve</span>
           )}
 
-          <span className="mini-diamond">
-            ◆
-          </span>
+          <span className="mini-diamond">◆</span>
         </div>
       </div>
     </article>
@@ -186,8 +165,7 @@ function ProductCard({
 }
 
 export default function Home() {
-  const whatsappUrl =
-    "https://wa.me/5511947944345";
+  const whatsappUrl = "https://wa.me/5511947944345";
 
   const instagramUrl =
     "https://www.instagram.com/maconfeccoesebrindes";
@@ -243,9 +221,8 @@ export default function Home() {
             </h1>
 
             <p>
-              Confecções, produtos personalizados e
-              tecnologia reunidos em uma nova experiência
-              digital da M.A.
+              Confecções, produtos personalizados e tecnologia reunidos em uma
+              nova experiência digital da M.A.
             </p>
 
             <div className="hero-buttons">
@@ -271,9 +248,7 @@ export default function Home() {
               <span className="construction-dot" />
 
               <div>
-                <strong>
-                  Novo site em construção
-                </strong>
+                <strong>Novo site em construção</strong>
 
                 <small>
                   Estamos preparando uma experiência completa.
@@ -292,10 +267,7 @@ export default function Home() {
             </div>
 
             <div className="visual-card visual-main">
-              <img
-                src="/MA-SITE-BEBES.png"
-                alt="MA System Baby"
-              />
+              <img src="/MA-SITE-BEBES.png" alt="MA System Baby" />
             </div>
 
             <div className="visual-card visual-left">
@@ -337,14 +309,10 @@ export default function Home() {
 
       <section className="showcase">
         <div className="section-heading">
-          <div className="heading-number">
-            01
-          </div>
+          <div className="heading-number">01</div>
 
           <div>
-            <span className="section-kicker">
-              Nosso universo
-            </span>
+            <span className="section-kicker">Nosso universo</span>
 
             <h2>
               Soluções que unem
@@ -354,9 +322,8 @@ export default function Home() {
           </div>
 
           <p>
-            Uma seleção do que já fazemos hoje e das
-            experiências digitais que estão chegando ao
-            ecossistema M.A.
+            Uma seleção do que já fazemos hoje e das experiências digitais que
+            estão chegando ao ecossistema M.A.
           </p>
         </div>
 
@@ -402,10 +369,9 @@ export default function Home() {
             </h2>
 
             <p>
-              Seja para vestir uma equipe, fortalecer uma
-              marca ou criar um presente especial, cada
-              projeto começa com uma ideia e ganha forma
-              com cuidado em cada detalhe.
+              Seja para vestir uma equipe, fortalecer uma marca ou criar um
+              presente especial, cada projeto começa com uma ideia e ganha
+              forma com cuidado em cada detalhe.
             </p>
 
             <a
@@ -421,47 +387,35 @@ export default function Home() {
 
           <div className="brand-message-side">
             <div className="message-box">
-              <span className="message-number">
-                01
-              </span>
+              <span className="message-number">01</span>
 
-              <strong>
-                Personalização
-              </strong>
+              <strong>Personalização</strong>
 
               <p>
-                Produtos pensados para representar sua marca,
-                empresa ou momento especial.
+                Produtos pensados para representar sua marca, empresa ou
+                momento especial.
               </p>
             </div>
 
             <div className="message-box">
-              <span className="message-number">
-                02
-              </span>
+              <span className="message-number">02</span>
 
-              <strong>
-                Acabamento
-              </strong>
+              <strong>Acabamento</strong>
 
               <p>
-                Atenção à apresentação, identidade visual
-                e qualidade de cada projeto.
+                Atenção à apresentação, identidade visual e qualidade de cada
+                projeto.
               </p>
             </div>
 
             <div className="message-box">
-              <span className="message-number">
-                03
-              </span>
+              <span className="message-number">03</span>
 
-              <strong>
-                Soluções digitais
-              </strong>
+              <strong>Soluções digitais</strong>
 
               <p>
-                Tecnologia integrada para ampliar a
-                experiência dos nossos produtos e serviços.
+                Tecnologia integrada para ampliar a experiência dos nossos
+                produtos e serviços.
               </p>
             </div>
           </div>
@@ -483,9 +437,7 @@ export default function Home() {
           </div>
 
           <div className="system-copy">
-            <span className="section-kicker">
-              MA System
-            </span>
+            <span className="section-kicker">MA System</span>
 
             <h2>
               Tecnologia criada
@@ -494,9 +446,8 @@ export default function Home() {
             </h2>
 
             <p>
-              O MA System nasce para transformar experiências
-              especiais em soluções digitais simples,
-              organizadas e bonitas.
+              O MA System nasce para transformar experiências especiais em
+              soluções digitais simples, organizadas e bonitas.
             </p>
 
             <div className="system-features">
@@ -532,9 +483,7 @@ export default function Home() {
         <div className="coming-decoration coming-two" />
 
         <div className="coming-inner">
-          <span>
-            NOVA EXPERIÊNCIA
-          </span>
+          <span>NOVA EXPERIÊNCIA</span>
 
           <h2>
             Estamos construindo
@@ -543,8 +492,8 @@ export default function Home() {
           </h2>
 
           <p>
-            Em breve, uma nova loja virtual, novos produtos
-            e novas soluções digitais da M.A.
+            Em breve, uma nova loja virtual, novos produtos e novas soluções
+            digitais da M.A.
           </p>
 
           <div className="coming-divider">
@@ -560,13 +509,9 @@ export default function Home() {
 
         <div className="footer-inner">
           <div className="footer-company">
-            <strong>
-              M.A Confecções e Brindes
-            </strong>
+            <strong>M.A Confecções e Brindes</strong>
 
-            <span>
-              CNPJ 57.739.176/0001-87
-            </span>
+            <span>CNPJ 57.739.176/0001-87</span>
           </div>
 
           <div className="footer-social">
@@ -607,10 +552,7 @@ export default function Home() {
         className="whatsapp-floating"
         aria-label="Falar pelo WhatsApp"
       >
-        <WhatsAppIcon
-          size={32}
-          white
-        />
+        <WhatsAppIcon size={32} white />
       </a>
 
       <style>{`
@@ -618,19 +560,12 @@ export default function Home() {
           box-sizing: border-box;
         }
 
-        html {
-          scroll-behavior: smooth;
-        }
-
-        body {
-          margin: 0;
-          background: #f7f2ec;
-        }
-
         .site {
-          position: relative;
-          overflow: hidden;
+          width: 100%;
+          max-width: 100%;
           min-height: 100vh;
+          position: relative;
+          overflow-x: hidden;
           background:
             linear-gradient(
               180deg,
@@ -640,10 +575,7 @@ export default function Home() {
               #f0e8e1 100%
             );
           color: #30272a;
-          font-family:
-            Arial,
-            Helvetica,
-            sans-serif;
+          font-family: Arial, Helvetica, sans-serif;
         }
 
         .page-decoration {
@@ -690,8 +622,7 @@ export default function Home() {
         .large-ring {
           position: absolute;
           border-radius: 50%;
-          border:
-            1px solid rgba(188, 139, 66, 0.17);
+          border: 1px solid rgba(188, 139, 66, 0.17);
         }
 
         .ring-top {
@@ -712,22 +643,21 @@ export default function Home() {
           position: sticky;
           top: 0;
           z-index: 100;
+          width: 100%;
           background: #ffffff;
-          border-bottom:
-            1px solid #eee7e2;
-          box-shadow:
-            0 5px 20px rgba(62, 43, 48, 0.035);
+          border-bottom: 1px solid #eee7e2;
+          box-shadow: 0 5px 20px rgba(62, 43, 48, 0.035);
         }
 
         .header-inner {
+          width: 100%;
           max-width: 1220px;
           min-height: 84px;
           padding: 10px 24px;
           margin: 0 auto;
           display: flex;
           align-items: center;
-          justify-content:
-            space-between;
+          justify-content: space-between;
           gap: 22px;
         }
 
@@ -739,6 +669,7 @@ export default function Home() {
         }
 
         .header-actions {
+          min-width: 0;
           display: flex;
           align-items: center;
           gap: 25px;
@@ -763,21 +694,14 @@ export default function Home() {
           text-decoration: none;
           font-size: 11px;
           font-weight: 800;
+          white-space: nowrap;
           background:
             linear-gradient(
               135deg,
               #641a35,
               #842d4a
             );
-          box-shadow:
-            0 10px 24px rgba(94, 27, 52, 0.16);
-          transition:
-            transform 0.2s ease;
-        }
-
-        .header-button:hover {
-          transform:
-            translateY(-2px);
+          box-shadow: 0 10px 24px rgba(94, 27, 52, 0.16);
         }
 
         .header-button span {
@@ -788,21 +712,24 @@ export default function Home() {
         .hero {
           position: relative;
           z-index: 1;
+          width: 100%;
           padding: 74px 24px 95px;
+          overflow: hidden;
         }
 
         .hero-inner {
+          width: 100%;
           max-width: 1220px;
           min-height: 580px;
           margin: 0 auto;
           display: grid;
-          grid-template-columns:
-            0.88fr 1.12fr;
+          grid-template-columns: 0.88fr 1.12fr;
           gap: 65px;
           align-items: center;
         }
 
         .hero-copy {
+          min-width: 0;
           position: relative;
           z-index: 4;
         }
@@ -822,18 +749,15 @@ export default function Home() {
         .hero-kicker span {
           width: 43px;
           height: 1px;
+          flex: 0 0 43px;
           background: #b98a48;
         }
 
         .hero h1 {
           margin: 0;
           color: #302629;
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
-          font-size:
-            clamp(53px, 6.4vw, 82px);
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: clamp(53px, 6.4vw, 82px);
           font-weight: 400;
           line-height: 0.98;
           letter-spacing: -2.4px;
@@ -871,21 +795,17 @@ export default function Home() {
           text-decoration: none;
           font-size: 11px;
           font-weight: 800;
-          transition:
-            transform 0.2s ease,
-            box-shadow 0.2s ease;
         }
 
         .button-primary {
+          color: white;
           background:
             linear-gradient(
               135deg,
               #641a35,
               #882e4b
             );
-          color: white;
-          box-shadow:
-            0 12px 28px rgba(102, 28, 55, 0.16);
+          box-shadow: 0 12px 28px rgba(102, 28, 55, 0.16);
         }
 
         .button-primary span {
@@ -895,28 +815,18 @@ export default function Home() {
 
         .button-secondary {
           color: #6f293f;
-          background:
-            rgba(255, 255, 255, 0.62);
-          border:
-            1px solid rgba(126, 80, 87, 0.19);
-        }
-
-        .button-primary:hover,
-        .button-secondary:hover {
-          transform:
-            translateY(-2px);
+          background: rgba(255, 255, 255, 0.62);
+          border: 1px solid rgba(126, 80, 87, 0.19);
         }
 
         .construction-badge {
           width: fit-content;
+          max-width: 100%;
           margin-top: 38px;
-          padding:
-            10px 15px 10px 12px;
+          padding: 10px 15px 10px 12px;
           border-radius: 999px;
-          border:
-            1px solid rgba(169, 126, 72, 0.18);
-          background:
-            rgba(255, 255, 255, 0.45);
+          border: 1px solid rgba(169, 126, 72, 0.18);
+          background: rgba(255, 255, 255, 0.45);
           display: flex;
           align-items: center;
           gap: 10px;
@@ -925,14 +835,14 @@ export default function Home() {
         .construction-dot {
           width: 8px;
           height: 8px;
+          flex: 0 0 8px;
           border-radius: 50%;
           background: #b88948;
-          box-shadow:
-            0 0 0 5px
-            rgba(184, 137, 72, 0.10);
+          box-shadow: 0 0 0 5px rgba(184, 137, 72, 0.10);
         }
 
         .construction-badge div {
+          min-width: 0;
           display: flex;
           flex-direction: column;
           gap: 2px;
@@ -950,6 +860,8 @@ export default function Home() {
 
         .hero-visual {
           position: relative;
+          min-width: 0;
+          width: 100%;
           height: 560px;
         }
 
@@ -960,8 +872,7 @@ export default function Home() {
           border-radius: 50%;
           top: 22px;
           left: 50%;
-          transform:
-            translateX(-50%);
+          transform: translateX(-50%);
           background:
             radial-gradient(
               circle,
@@ -969,14 +880,13 @@ export default function Home() {
               rgba(225, 190, 129, 0.08) 55%,
               transparent 70%
             );
-          border:
-            1px solid rgba(191, 144, 70, 0.22);
+          border: 1px solid rgba(191, 144, 70, 0.22);
         }
 
         .visual-lines {
           position: absolute;
           bottom: 38px;
-          right: -15px;
+          right: 0;
           width: 290px;
           display: flex;
           flex-direction: column;
@@ -986,7 +896,6 @@ export default function Home() {
         }
 
         .visual-lines span {
-          display: block;
           height: 1px;
           background:
             linear-gradient(
@@ -1000,33 +909,32 @@ export default function Home() {
         .visual-card {
           position: absolute;
           overflow: hidden;
-          border:
-            1px solid rgba(174, 128, 69, 0.30);
+          border: 1px solid rgba(174, 128, 69, 0.30);
           background: white;
-          box-shadow:
-            0 22px 48px rgba(54, 36, 40, 0.13);
+          box-shadow: 0 22px 48px rgba(54, 36, 40, 0.13);
         }
 
         .visual-card img {
           width: 100%;
           height: 100%;
-          object-fit: cover;
           display: block;
+          object-fit: cover;
         }
 
         .visual-main {
           width: 430px;
+          max-width: 72%;
           aspect-ratio: 4 / 3;
           top: 88px;
           left: 50%;
           z-index: 4;
           border-radius: 22px;
-          transform:
-            translateX(-50%);
+          transform: translateX(-50%);
         }
 
         .visual-left {
           width: 245px;
+          max-width: 42%;
           aspect-ratio: 4 / 3;
           left: 0;
           bottom: 28px;
@@ -1037,8 +945,9 @@ export default function Home() {
 
         .visual-right {
           width: 240px;
+          max-width: 42%;
           aspect-ratio: 4 / 3;
-          right: -5px;
+          right: 0;
           bottom: 52px;
           z-index: 5;
           border-radius: 18px;
@@ -1057,10 +966,7 @@ export default function Home() {
 
         .visual-label span {
           color: #761f3e;
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
+          font-family: Georgia, "Times New Roman", serif;
           font-size: 30px;
         }
 
@@ -1074,15 +980,14 @@ export default function Home() {
         .signature-strip {
           position: relative;
           z-index: 3;
-          border-top:
-            1px solid rgba(175, 126, 62, 0.14);
-          border-bottom:
-            1px solid rgba(175, 126, 62, 0.14);
-          background:
-            rgba(255, 255, 255, 0.29);
+          width: 100%;
+          border-top: 1px solid rgba(175, 126, 62, 0.14);
+          border-bottom: 1px solid rgba(175, 126, 62, 0.14);
+          background: rgba(255, 255, 255, 0.29);
         }
 
         .signature-inner {
+          width: 100%;
           max-width: 1060px;
           min-height: 62px;
           margin: 0 auto;
@@ -1109,17 +1014,17 @@ export default function Home() {
         .showcase {
           position: relative;
           z-index: 2;
+          width: 100%;
           max-width: 1220px;
           margin: 0 auto;
-          padding:
-            92px 24px 105px;
+          padding: 92px 24px 105px;
         }
 
         .section-heading {
+          width: 100%;
           margin-bottom: 36px;
           display: grid;
-          grid-template-columns:
-            45px minmax(0, 1fr) 340px;
+          grid-template-columns: 45px minmax(0, 1fr) 340px;
           gap: 21px;
           align-items: end;
         }
@@ -1127,10 +1032,7 @@ export default function Home() {
         .heading-number {
           padding-bottom: 7px;
           color: #af854e;
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
+          font-family: Georgia, "Times New Roman", serif;
           font-size: 11px;
         }
 
@@ -1146,12 +1048,8 @@ export default function Home() {
         .system-copy h2 {
           margin: 8px 0 0;
           color: #30262a;
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
-          font-size:
-            clamp(33px, 4.2vw, 48px);
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: clamp(33px, 4.2vw, 48px);
           font-weight: 400;
           line-height: 1.04;
           letter-spacing: -1.2px;
@@ -1166,43 +1064,31 @@ export default function Home() {
         .section-heading > p {
           margin: 0;
           padding-left: 22px;
-          border-left:
-            1px solid rgba(174, 125, 59, 0.21);
+          border-left: 1px solid rgba(174, 125, 59, 0.21);
           color: #7b6f6c;
           font-size: 12px;
           line-height: 1.75;
         }
 
         .cards-grid {
+          width: 100%;
           display: grid;
-          grid-template-columns:
-            repeat(3, minmax(0, 1fr));
+          grid-template-columns: repeat(3, minmax(0, 1fr));
           gap: 20px;
         }
 
         .premium-card {
+          min-width: 0;
           overflow: hidden;
           border-radius: 22px;
-          border:
-            1px solid rgba(173, 132, 91, 0.20);
-          background:
-            rgba(255, 255, 255, 0.77);
-          box-shadow:
-            0 16px 38px rgba(56, 38, 42, 0.07);
-          transition:
-            transform 0.3s ease,
-            box-shadow 0.3s ease;
-        }
-
-        .premium-card:hover {
-          transform:
-            translateY(-7px);
-          box-shadow:
-            0 25px 52px rgba(56, 38, 42, 0.11);
+          border: 1px solid rgba(173, 132, 91, 0.20);
+          background: rgba(255, 255, 255, 0.77);
+          box-shadow: 0 16px 38px rgba(56, 38, 42, 0.07);
         }
 
         .premium-card-image {
           position: relative;
+          width: 100%;
           aspect-ratio: 4 / 3;
           overflow: hidden;
         }
@@ -1212,14 +1098,6 @@ export default function Home() {
           height: 100%;
           object-fit: cover;
           display: block;
-          transition:
-            transform 0.45s ease;
-        }
-
-        .premium-card:hover
-        .premium-card-image img {
-          transform:
-            scale(1.035);
         }
 
         .premium-card-overlay {
@@ -1244,8 +1122,7 @@ export default function Home() {
 
         .premium-card-content {
           min-height: 215px;
-          padding:
-            22px 22px 20px;
+          padding: 22px 22px 20px;
           display: flex;
           flex-direction: column;
         }
@@ -1262,10 +1139,7 @@ export default function Home() {
         .premium-card h3 {
           margin: 0;
           color: #31272b;
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
+          font-family: Georgia, "Times New Roman", serif;
           font-size: 23px;
           font-weight: 400;
         }
@@ -1282,8 +1156,7 @@ export default function Home() {
           padding-top: 19px;
           display: flex;
           align-items: center;
-          justify-content:
-            space-between;
+          justify-content: space-between;
         }
 
         .coming-soon {
@@ -1319,14 +1192,15 @@ export default function Home() {
         .brand-message {
           position: relative;
           z-index: 2;
+          width: 100%;
+          overflow: hidden;
+          color: white;
           background:
             linear-gradient(
               135deg,
               #35252b 0%,
               #2a1d22 100%
             );
-          color: white;
-          overflow: hidden;
         }
 
         .brand-message::before {
@@ -1337,36 +1211,18 @@ export default function Home() {
           top: -290px;
           right: -130px;
           border-radius: 50%;
-          border:
-            1px solid rgba(211, 168, 97, 0.17);
-        }
-
-        .brand-message::after {
-          content: "";
-          position: absolute;
-          width: 300px;
-          height: 300px;
-          right: 11%;
-          bottom: -230px;
-          border-radius: 50%;
-          background:
-            radial-gradient(
-              circle,
-              rgba(191, 139, 70, 0.11),
-              transparent 68%
-            );
+          border: 1px solid rgba(211, 168, 97, 0.17);
         }
 
         .brand-message-inner {
           position: relative;
           z-index: 2;
+          width: 100%;
           max-width: 1180px;
           margin: 0 auto;
-          padding:
-            72px 24px;
+          padding: 72px 24px;
           display: grid;
-          grid-template-columns:
-            1fr 0.9fr;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
           gap: 75px;
           align-items: center;
         }
@@ -1379,14 +1235,14 @@ export default function Home() {
           text-transform: uppercase;
         }
 
+        .brand-message-copy {
+          min-width: 0;
+        }
+
         .brand-message-copy h2 {
           margin: 11px 0 17px;
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
-          font-size:
-            clamp(39px, 5vw, 58px);
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: clamp(39px, 5vw, 58px);
           font-weight: 400;
           line-height: 1.02;
         }
@@ -1424,32 +1280,28 @@ export default function Home() {
         }
 
         .brand-message-side {
+          min-width: 0;
           display: grid;
           gap: 12px;
         }
 
         .message-box {
+          width: 100%;
           padding: 17px 18px;
           display: grid;
-          grid-template-columns:
-            35px 115px 1fr;
+          grid-template-columns: 35px 115px minmax(0, 1fr);
           gap: 12px;
           align-items: center;
-          border-top:
-            1px solid rgba(211, 168, 97, 0.16);
+          border-top: 1px solid rgba(211, 168, 97, 0.16);
         }
 
         .message-box:last-child {
-          border-bottom:
-            1px solid rgba(211, 168, 97, 0.16);
+          border-bottom: 1px solid rgba(211, 168, 97, 0.16);
         }
 
         .message-number {
           color: #d2a75f;
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
+          font-family: Georgia, "Times New Roman", serif;
           font-size: 10px;
         }
 
@@ -1459,6 +1311,7 @@ export default function Home() {
         }
 
         .message-box p {
+          min-width: 0;
           margin: 0;
           color: #bfb0b5;
           font-size: 10.5px;
@@ -1468,46 +1321,47 @@ export default function Home() {
         .system-highlight {
           position: relative;
           z-index: 2;
-          padding:
-            105px 24px 115px;
+          width: 100%;
+          padding: 105px 24px 115px;
+          overflow: hidden;
         }
 
         .system-highlight-inner {
+          width: 100%;
           max-width: 1160px;
           margin: 0 auto;
           display: grid;
-          grid-template-columns:
-            1.08fr 0.92fr;
+          grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
           gap: 75px;
           align-items: center;
         }
 
         .system-image-area {
+          min-width: 0;
           position: relative;
         }
 
         .system-frame {
           position: relative;
           z-index: 3;
+          width: 100%;
           overflow: hidden;
           border-radius: 24px;
-          border:
-            1px solid rgba(182, 133, 65, 0.28);
+          border: 1px solid rgba(182, 133, 65, 0.28);
           background: white;
-          box-shadow:
-            0 24px 58px rgba(50, 34, 39, 0.13);
+          box-shadow: 0 24px 58px rgba(50, 34, 39, 0.13);
         }
 
         .system-frame img {
           width: 100%;
+          height: auto;
           display: block;
         }
 
         .system-decoration {
           position: absolute;
           border-radius: 50%;
-          border:
-            1px solid rgba(189, 139, 67, 0.23);
+          border: 1px solid rgba(189, 139, 67, 0.23);
         }
 
         .system-decoration-one {
@@ -1525,6 +1379,7 @@ export default function Home() {
         }
 
         .system-copy {
+          min-width: 0;
           position: relative;
           z-index: 3;
         }
@@ -1538,26 +1393,22 @@ export default function Home() {
         }
 
         .system-features {
+          width: 100%;
           margin-top: 30px;
-          padding:
-            18px 0;
-          border-top:
-            1px solid rgba(168, 120, 61, 0.18);
-          border-bottom:
-            1px solid rgba(168, 120, 61, 0.18);
+          padding: 18px 0;
+          border-top: 1px solid rgba(168, 120, 61, 0.18);
+          border-bottom: 1px solid rgba(168, 120, 61, 0.18);
           display: grid;
-          grid-template-columns:
-            repeat(3, 1fr);
+          grid-template-columns: repeat(3, minmax(0, 1fr));
         }
 
         .system-features div {
+          min-width: 0;
           display: flex;
           flex-direction: column;
           gap: 5px;
-          padding:
-            0 15px;
-          border-right:
-            1px solid rgba(168, 120, 61, 0.15);
+          padding: 0 15px;
+          border-right: 1px solid rgba(168, 120, 61, 0.15);
         }
 
         .system-features div:first-child {
@@ -1570,10 +1421,7 @@ export default function Home() {
 
         .system-features strong {
           color: #b4864b;
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
+          font-family: Georgia, "Times New Roman", serif;
           font-size: 11px;
         }
 
@@ -1604,6 +1452,7 @@ export default function Home() {
         .coming-section {
           position: relative;
           z-index: 2;
+          width: 100%;
           overflow: hidden;
           background:
             linear-gradient(
@@ -1617,8 +1466,7 @@ export default function Home() {
         .coming-decoration {
           position: absolute;
           border-radius: 50%;
-          border:
-            1px solid rgba(213, 170, 101, 0.16);
+          border: 1px solid rgba(213, 170, 101, 0.16);
         }
 
         .coming-one {
@@ -1638,10 +1486,10 @@ export default function Home() {
         .coming-inner {
           position: relative;
           z-index: 2;
+          width: 100%;
           max-width: 790px;
           margin: 0 auto;
-          padding:
-            69px 20px 63px;
+          padding: 69px 20px 63px;
           text-align: center;
         }
 
@@ -1655,12 +1503,8 @@ export default function Home() {
         .coming-inner h2 {
           margin: 11px 0 14px;
           color: white;
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
-          font-size:
-            clamp(36px, 5vw, 55px);
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: clamp(36px, 5vw, 55px);
           font-weight: 400;
           line-height: 1.02;
         }
@@ -1680,6 +1524,7 @@ export default function Home() {
 
         .coming-divider {
           width: 170px;
+          max-width: 100%;
           margin: 26px auto 0;
           display: flex;
           align-items: center;
@@ -1691,16 +1536,15 @@ export default function Home() {
         .coming-divider i {
           flex: 1;
           height: 1px;
-          background:
-            rgba(210, 167, 99, 0.32);
+          background: rgba(210, 167, 99, 0.32);
         }
 
         .footer {
           position: relative;
           z-index: 2;
+          width: 100%;
           background: #1d1619;
-          padding:
-            22px 24px 15px;
+          padding: 22px 24px 15px;
         }
 
         .footer-gold-line {
@@ -1719,12 +1563,12 @@ export default function Home() {
         }
 
         .footer-inner {
+          width: 100%;
           max-width: 1180px;
           margin: 0 auto;
           display: flex;
           align-items: center;
-          justify-content:
-            space-between;
+          justify-content: space-between;
           gap: 25px;
           flex-wrap: wrap;
         }
@@ -1761,24 +1605,19 @@ export default function Home() {
           font-size: 10.5px;
         }
 
-        .footer-link:hover {
-          color: white;
-        }
-
         .copyright {
+          width: 100%;
           max-width: 1180px;
           margin: 15px auto 0;
           padding-top: 11px;
-          border-top:
-            1px solid rgba(255, 255, 255, 0.055);
+          border-top: 1px solid rgba(255, 255, 255, 0.055);
           text-align: center;
           color: #75696e;
           font-size: 9px;
         }
 
         .copyright span {
-          padding:
-            0 8px;
+          padding: 0 8px;
           color: #9a7547;
           font-size: 4px;
         }
@@ -1798,14 +1637,6 @@ export default function Home() {
           box-shadow:
             0 12px 30px rgba(19, 88, 45, 0.23),
             0 0 0 5px rgba(37, 211, 102, 0.09);
-          transition:
-            transform 0.2s ease;
-        }
-
-        .whatsapp-floating:hover {
-          transform:
-            translateY(-4px)
-            scale(1.04);
         }
 
         @media (max-width: 1000px) {
@@ -1815,10 +1646,11 @@ export default function Home() {
 
           .hero-inner {
             grid-template-columns: 1fr;
-            gap: 15px;
+            gap: 35px;
           }
 
           .hero-copy {
+            width: 100%;
             max-width: 700px;
             margin: 0 auto;
             text-align: center;
@@ -1849,8 +1681,7 @@ export default function Home() {
           }
 
           .section-heading {
-            grid-template-columns:
-              35px 1fr;
+            grid-template-columns: 35px minmax(0, 1fr);
           }
 
           .section-heading > p {
@@ -1858,8 +1689,7 @@ export default function Home() {
           }
 
           .cards-grid {
-            grid-template-columns:
-              repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
           .brand-message-inner {
@@ -1883,47 +1713,37 @@ export default function Home() {
         }
 
         @media (max-width: 680px) {
-          html,
-          body {
-            width: 100%;
-            max-width: 100%;
-            overflow-x: hidden;
-          }
-
           .site {
             width: 100%;
-            max-width: 100%;
+            max-width: 100vw;
             overflow-x: hidden;
           }
 
-          img {
-            max-width: 100%;
+          .page-decoration {
+            max-width: 100vw;
           }
 
           .header-inner {
-            width: 100%;
-            min-height: 70px;
-            padding: 8px 14px;
-            gap: 10px;
+            min-height: 68px;
+            padding: 8px 12px;
+            gap: 8px;
           }
 
           .header-logo {
-            width: 142px;
-            max-width: 47vw;
+            width: 138px;
+            max-width: 44vw;
             flex-shrink: 1;
           }
 
           .header-actions {
-            min-width: 0;
-            gap: 8px;
+            flex-shrink: 0;
+            gap: 0;
           }
 
           .header-button {
-            min-height: 37px;
-            max-width: 47vw;
-            padding: 0 12px;
-            font-size: 9px;
-            white-space: nowrap;
+            min-height: 36px;
+            padding: 0 11px;
+            font-size: 8.5px;
           }
 
           .header-button span {
@@ -1931,142 +1751,140 @@ export default function Home() {
           }
 
           .hero {
-            width: 100%;
-            padding: 48px 16px 58px;
-            overflow: hidden;
+            padding: 44px 16px 54px;
           }
 
           .hero-inner {
             width: 100%;
             max-width: 100%;
-            min-width: 0;
             min-height: 0;
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            gap: 28px;
           }
 
           .hero-copy {
             width: 100%;
             max-width: 100%;
             min-width: 0;
-            margin: 0 auto;
-            padding: 0;
+            margin: 0;
             text-align: center;
           }
 
           .hero-kicker {
+            width: 100%;
             max-width: 100%;
             justify-content: center;
-            gap: 8px;
-            font-size: 8px;
-            letter-spacing: 1.5px;
+            gap: 7px;
+            margin-bottom: 18px;
+            font-size: 7.5px;
+            letter-spacing: 1.1px;
           }
 
           .hero-kicker span {
-            width: 28px;
-            flex: 0 0 28px;
+            width: 22px;
+            flex-basis: 22px;
           }
 
           .hero h1 {
             width: 100%;
             max-width: 100%;
-            margin: 0 auto;
-            font-size: clamp(38px, 10.8vw, 48px);
-            line-height: 1.02;
-            letter-spacing: -1.3px;
-            overflow-wrap: normal;
+            margin: 0;
+            padding: 0;
+            font-size: clamp(35px, 10.5vw, 43px);
+            line-height: 1.04;
+            letter-spacing: -1.1px;
+            white-space: normal;
             word-break: normal;
+            overflow-wrap: normal;
+          }
+
+          .hero h1 br {
+            display: block;
           }
 
           .hero-copy > p {
             width: 100%;
-            max-width: 340px;
-            margin: 20px auto 0;
-            padding: 0 4px;
-            font-size: 13.5px;
+            max-width: 330px;
+            margin: 18px auto 0;
+            padding: 0;
+            font-size: 13px;
             line-height: 1.65;
           }
 
           .hero-buttons {
             width: 100%;
-            max-width: 330px;
-            margin: 25px auto 0;
+            max-width: 320px;
+            margin: 24px auto 0;
             display: grid;
             grid-template-columns: 1fr;
-            gap: 10px;
+            gap: 9px;
           }
 
           .button-primary,
           .button-secondary {
             width: 100%;
-            min-height: 46px;
-            padding: 0 16px;
+            min-height: 45px;
+            padding: 0 14px;
           }
 
           .construction-badge {
             width: 100%;
-            max-width: 330px;
-            margin: 24px auto 0;
-            padding: 11px 13px;
-            border-radius: 16px;
-            justify-content: flex-start;
+            max-width: 320px;
+            margin: 22px auto 0;
+            padding: 11px 12px;
+            border-radius: 15px;
             text-align: left;
           }
 
-          .construction-badge div {
-            min-width: 0;
-          }
-
+          .construction-badge strong,
           .construction-badge small {
-            line-height: 1.35;
+            white-space: normal;
           }
 
           .hero-visual {
-            position: relative;
             width: 100%;
-            max-width: 390px;
-            height: 355px;
+            max-width: 360px;
+            height: 335px;
             margin: 0 auto;
-            overflow: visible;
           }
 
           .visual-gold-circle {
-            width: 300px;
-            height: 300px;
-            top: 14px;
+            width: 270px;
+            height: 270px;
+            top: 18px;
           }
 
           .visual-lines {
-            width: 180px;
-            right: 0;
-            bottom: 6px;
+            width: 155px;
+            right: 8px;
+            bottom: 8px;
           }
 
           .visual-main {
             width: 82%;
-            max-width: 320px;
-            top: 42px;
+            max-width: 295px;
+            top: 43px;
             left: 50%;
-            border-radius: 16px;
+            border-radius: 15px;
             transform: translateX(-50%);
           }
 
           .visual-left {
-            width: 45%;
-            max-width: 176px;
-            left: 2%;
-            bottom: 6px;
-            border-radius: 13px;
+            width: 44%;
+            max-width: 158px;
+            left: 3%;
+            bottom: 8px;
+            border-radius: 12px;
             transform: rotate(-3deg);
           }
 
           .visual-right {
-            width: 45%;
-            max-width: 176px;
-            right: 2%;
-            bottom: 12px;
-            border-radius: 13px;
+            width: 44%;
+            max-width: 158px;
+            right: 3%;
+            bottom: 13px;
+            border-radius: 12px;
             transform: rotate(3deg);
           }
 
@@ -2075,42 +1893,41 @@ export default function Home() {
           }
 
           .signature-inner {
-            gap: 11px;
-            padding: 13px 14px;
-            font-size: 7.5px;
-            letter-spacing: 1.2px;
+            min-height: auto;
+            padding: 15px 14px;
+            gap: 10px;
+            font-size: 7px;
+            letter-spacing: 1px;
           }
 
           .showcase {
-            width: 100%;
             padding: 58px 16px 70px;
           }
 
           .section-heading {
-            width: 100%;
             grid-template-columns: 1fr;
+            gap: 12px;
           }
 
           .heading-number {
             display: none;
           }
 
+          .section-heading h2,
+          .system-copy h2 {
+            font-size: clamp(31px, 9.5vw, 40px);
+            letter-spacing: -0.7px;
+          }
+
           .section-heading > p {
             grid-column: auto;
             padding: 14px 0 0;
             border-left: 0;
-            border-top:
-              1px solid rgba(174, 125, 59, 0.17);
+            border-top: 1px solid rgba(174, 125, 59, 0.17);
           }
 
           .cards-grid {
-            width: 100%;
             grid-template-columns: 1fr;
-          }
-
-          .premium-card {
-            width: 100%;
-            min-width: 0;
           }
 
           .premium-card-content {
@@ -2122,13 +1939,22 @@ export default function Home() {
           }
 
           .brand-message-inner {
-            width: 100%;
-            padding: 57px 18px;
+            padding: 55px 18px;
+            gap: 38px;
+          }
+
+          .brand-message-copy h2 {
+            font-size: clamp(34px, 10vw, 43px);
           }
 
           .message-box {
-            width: 100%;
-            grid-template-columns: 30px minmax(0, 1fr);
+            grid-template-columns: 28px minmax(0, 1fr);
+            gap: 9px;
+            padding: 16px 4px;
+          }
+
+          .message-box strong {
+            min-width: 0;
           }
 
           .message-box p {
@@ -2136,9 +1962,7 @@ export default function Home() {
           }
 
           .system-highlight {
-            width: 100%;
-            padding: 72px 16px 82px;
-            overflow: hidden;
+            padding: 70px 16px 82px;
           }
 
           .system-highlight-inner {
@@ -2147,10 +1971,18 @@ export default function Home() {
             gap: 42px;
           }
 
-          .system-image-area,
-          .system-frame {
-            width: 100%;
-            max-width: 100%;
+          .system-decoration-one {
+            width: 190px;
+            height: 190px;
+            left: -95px;
+            bottom: -80px;
+          }
+
+          .system-decoration-two {
+            width: 120px;
+            height: 120px;
+            right: -55px;
+            top: -45px;
           }
 
           .system-features {
@@ -2160,28 +1992,30 @@ export default function Home() {
           .system-features div {
             padding: 10px 0;
             border-right: 0;
-            border-bottom:
-              1px solid rgba(168, 120, 61, 0.12);
+            border-bottom: 1px solid rgba(168, 120, 61, 0.12);
           }
 
           .system-features div:last-child {
             border-bottom: 0;
           }
 
+          .system-link {
+            justify-content: center;
+          }
+
           .coming-inner {
-            width: 100%;
-            padding-left: 18px;
-            padding-right: 18px;
+            padding: 58px 18px 54px;
+          }
+
+          .coming-inner h2 {
+            font-size: clamp(33px, 9.5vw, 43px);
           }
 
           .footer {
-            width: 100%;
-            padding-left: 18px;
-            padding-right: 18px;
+            padding: 22px 18px 15px;
           }
 
           .footer-inner {
-            width: 100%;
             align-items: flex-start;
             flex-direction: column;
           }
@@ -2192,11 +2026,53 @@ export default function Home() {
             gap: 11px;
           }
 
+          .copyright {
+            line-height: 1.6;
+          }
+
           .whatsapp-floating {
             width: 54px;
             height: 54px;
             right: 16px;
             bottom: 16px;
+          }
+        }
+
+        @media (max-width: 390px) {
+          .header-logo {
+            width: 126px;
+          }
+
+          .header-button {
+            padding: 0 9px;
+            font-size: 8px;
+          }
+
+          .hero {
+            padding-left: 14px;
+            padding-right: 14px;
+          }
+
+          .hero h1 {
+            font-size: 36px;
+          }
+
+          .hero-copy > p {
+            max-width: 300px;
+          }
+
+          .hero-visual {
+            max-width: 330px;
+            height: 310px;
+          }
+
+          .visual-main {
+            max-width: 270px;
+          }
+
+          .visual-left,
+          .visual-right {
+            max-width: 142px;
           }
         }
       `}</style>
