@@ -2,6 +2,7 @@
 
 import {
   FormEvent,
+  Suspense,
   useState,
 } from "react";
 
@@ -10,7 +11,7 @@ import {
   useSearchParams,
 } from "next/navigation";
 
-export default function RedefinirSenhaPage() {
+function RedefinirSenhaContent() {
   const router =
     useRouter();
 
@@ -258,12 +259,8 @@ export default function RedefinirSenhaPage() {
         .reset-heading h1 {
           margin: 0;
 
-          font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
-
           font-size: 34px;
+          font-weight: 800;
         }
 
         .reset-heading p {
@@ -331,5 +328,83 @@ export default function RedefinirSenhaPage() {
         }
       `}</style>
     </main>
+  );
+}
+
+function RedefinirSenhaFallback() {
+  return (
+    <main className="ma-page">
+      <div className="reset-loading-wrap">
+        <section className="reset-loading-card ma-card">
+          <span className="ma-eyebrow">
+            Segurança da conta
+          </span>
+
+          <p>
+            Carregando...
+          </p>
+        </section>
+      </div>
+
+      <style jsx>{`
+        .reset-loading-wrap {
+          width: min(
+            470px,
+            calc(100% - 24px)
+          );
+
+          margin:
+            46px auto 70px;
+        }
+
+        .reset-loading-card {
+          min-height: 180px;
+          padding: 30px;
+
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+
+          text-align: center;
+        }
+
+        .reset-loading-card p {
+          margin: 10px 0 0;
+
+          color:
+            var(--ma-text-muted);
+
+          font-size: 14px;
+          font-weight: 600;
+        }
+
+        @media (
+          max-width: 520px
+        ) {
+          .reset-loading-wrap {
+            margin:
+              24px auto 48px;
+          }
+
+          .reset-loading-card {
+            padding:
+              22px 18px;
+          }
+        }
+      `}</style>
+    </main>
+  );
+}
+
+export default function RedefinirSenhaPage() {
+  return (
+    <Suspense
+      fallback={
+        <RedefinirSenhaFallback />
+      }
+    >
+      <RedefinirSenhaContent />
+    </Suspense>
   );
 }
