@@ -1,26 +1,644 @@
 @import "tailwindcss";
 
+/* =========================================================
+   M.A. CONFECÇÕES E BRINDES
+   DESIGN SYSTEM GLOBAL
+   ========================================================= */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Marca */
+  --ma-wine: #781834;
+  --ma-wine-dark: #501020;
+  --ma-wine-light: #f7eff1;
+
+  --ma-gold: #b89154;
+  --ma-gold-light: #f4ede1;
+
+  /* Fundos */
+  --ma-bg: #f7f5f2;
+  --ma-bg-soft: #fbfaf8;
+  --ma-surface: #ffffff;
+  --ma-surface-dark: #211b1d;
+
+  /* Textos */
+  --ma-text: #211b1d;
+  --ma-text-soft: #70696b;
+  --ma-text-muted: #91898b;
+  --ma-text-inverse: #ffffff;
+
+  /* Bordas */
+  --ma-border: rgba(33, 27, 29, 0.09);
+  --ma-border-strong: rgba(33, 27, 29, 0.15);
+
+  /* Estados */
+  --ma-success: #247a51;
+  --ma-success-bg: #edf8f2;
+
+  --ma-warning: #966a17;
+  --ma-warning-bg: #fff7e5;
+
+  --ma-danger: #a52a38;
+  --ma-danger-bg: #fff0f2;
+
+  /* Radius */
+  --ma-radius-sm: 10px;
+  --ma-radius-md: 14px;
+  --ma-radius-lg: 20px;
+  --ma-radius-xl: 26px;
+
+  /* Sombras */
+  --ma-shadow-sm:
+    0 8px 24px rgba(33, 27, 29, 0.05);
+
+  --ma-shadow-md:
+    0 18px 45px rgba(33, 27, 29, 0.075);
+
+  --ma-shadow-lg:
+    0 28px 75px rgba(33, 27, 29, 0.1);
+
+  /* Larguras */
+  --ma-container: 1180px;
+  --ma-container-wide: 1320px;
+
+  /* Transições */
+  --ma-transition: 180ms ease;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--ma-bg);
+  --color-foreground: var(--ma-text);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif !important;
+}
+
+html {
+  width: 100%;
+  min-width: 0;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif !important;
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+
+  background: var(--ma-bg);
+  color: var(--ma-text);
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  border: 0;
+}
+
+a {
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* =========================================================
+   ESTRUTURA DE PÁGINA
+   ========================================================= */
+
+.ma-page {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--ma-bg);
+}
+
+.ma-container {
+  width: min(
+    var(--ma-container),
+    calc(100% - 40px)
+  );
+  margin-inline: auto;
+}
+
+.ma-container-wide {
+  width: min(
+    var(--ma-container-wide),
+    calc(100% - 40px)
+  );
+  margin-inline: auto;
+}
+
+.ma-section {
+  padding-block: 54px;
+}
+
+.ma-section-sm {
+  padding-block: 32px;
+}
+
+/* =========================================================
+   TIPOGRAFIA
+   ========================================================= */
+
+.ma-eyebrow {
+  display: inline-block;
+
+  margin-bottom: 10px;
+
+  color: var(--ma-wine);
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ma-title {
+  margin: 0;
+
+  color: var(--ma-text);
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: clamp(
+    34px,
+    5vw,
+    58px
+  );
+
+  line-height: 1.02;
+}
+
+.ma-section-title {
+  margin: 0;
+
+  color: var(--ma-text);
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: clamp(
+    28px,
+    4vw,
+    40px
+  );
+
+  line-height: 1.08;
+}
+
+.ma-subtitle {
+  max-width: 680px;
+
+  margin:
+    14px 0 0;
+
+  color: var(--ma-text-soft);
+
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* =========================================================
+   BOTÕES
+   ========================================================= */
+
+.ma-btn {
+  min-height: 44px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding:
+    0 18px;
+
+  border-radius:
+    var(--ma-radius-md);
+
+  border:
+    1px solid transparent;
+
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  transition:
+    transform var(--ma-transition),
+    box-shadow var(--ma-transition),
+    background var(--ma-transition),
+    border-color var(--ma-transition),
+    color var(--ma-transition),
+    opacity var(--ma-transition);
+}
+
+.ma-btn:hover {
+  transform:
+    translateY(-1px);
+}
+
+.ma-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.ma-btn-primary {
+  background:
+    var(--ma-wine);
+
+  color:
+    var(--ma-text-inverse);
+
+  box-shadow:
+    0 9px 22px
+    rgba(120, 24, 52, 0.17);
+}
+
+.ma-btn-primary:hover {
+  background:
+    var(--ma-wine-dark);
+}
+
+.ma-btn-secondary {
+  background:
+    var(--ma-surface);
+
+  border-color:
+    var(--ma-border-strong);
+
+  color:
+    var(--ma-wine);
+}
+
+.ma-btn-secondary:hover {
+  border-color:
+    rgba(120, 24, 52, 0.35);
+}
+
+.ma-btn-dark {
+  background:
+    var(--ma-surface-dark);
+
+  color:
+    #ffffff;
+}
+
+.ma-btn-ghost {
+  background:
+    transparent;
+
+  color:
+    var(--ma-wine);
+}
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.ma-card {
+  background:
+    var(--ma-surface);
+
+  border:
+    1px solid
+    var(--ma-border);
+
+  border-radius:
+    var(--ma-radius-lg);
+
+  box-shadow:
+    var(--ma-shadow-sm);
+
+  transition:
+    transform var(--ma-transition),
+    box-shadow var(--ma-transition),
+    border-color var(--ma-transition);
+}
+
+.ma-card-hover:hover {
+  transform:
+    translateY(-3px);
+
+  border-color:
+    rgba(120, 24, 52, 0.18);
+
+  box-shadow:
+    var(--ma-shadow-md);
+}
+
+.ma-card-compact {
+  padding: 18px;
+}
+
+.ma-card-normal {
+  padding: 24px;
+}
+
+/* =========================================================
+   FORMULÁRIOS
+   ========================================================= */
+
+.ma-field {
+  display: grid;
+  gap: 7px;
+}
+
+.ma-label {
+  color:
+    var(--ma-text);
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ma-input,
+.ma-select,
+.ma-textarea {
+  width: 100%;
+
+  border:
+    1px solid
+    var(--ma-border-strong);
+
+  border-radius:
+    var(--ma-radius-md);
+
+  background:
+    var(--ma-surface);
+
+  color:
+    var(--ma-text);
+
+  outline: none;
+
+  transition:
+    border-color var(--ma-transition),
+    box-shadow var(--ma-transition);
+}
+
+.ma-input,
+.ma-select {
+  min-height: 48px;
+
+  padding:
+    0 14px;
+}
+
+.ma-textarea {
+  min-height: 120px;
+
+  padding:
+    13px 14px;
+
+  resize: vertical;
+}
+
+.ma-input:focus,
+.ma-select:focus,
+.ma-textarea:focus {
+  border-color:
+    var(--ma-wine);
+
+  box-shadow:
+    0 0 0 4px
+    rgba(120, 24, 52, 0.075);
+}
+
+.ma-input::placeholder,
+.ma-textarea::placeholder {
+  color:
+    #aaa3a5;
+}
+
+/* =========================================================
+   MENSAGENS
+   ========================================================= */
+
+.ma-alert {
+  padding:
+    12px 14px;
+
+  border-radius:
+    var(--ma-radius-md);
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.ma-alert-danger {
+  background:
+    var(--ma-danger-bg);
+
+  color:
+    var(--ma-danger);
+}
+
+.ma-alert-success {
+  background:
+    var(--ma-success-bg);
+
+  color:
+    var(--ma-success);
+}
+
+.ma-alert-warning {
+  background:
+    var(--ma-warning-bg);
+
+  color:
+    var(--ma-warning);
+}
+
+/* =========================================================
+   CABEÇALHO DE PÁGINAS INTERNAS
+   ========================================================= */
+
+.ma-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  padding:
+    42px 0 28px;
+
+  border-bottom:
+    1px solid
+    var(--ma-border);
+}
+
+.ma-page-header-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 10px;
+}
+
+/* =========================================================
+   GRIDS
+   ========================================================= */
+
+.ma-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.ma-grid-2 {
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+}
+
+.ma-grid-3 {
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+}
+
+.ma-grid-4 {
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+}
+
+/* =========================================================
+   ÍCONES / BADGES
+   ========================================================= */
+
+.ma-icon-box {
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius:
+    12px;
+
+  background:
+    var(--ma-wine-light);
+
+  color:
+    var(--ma-wine);
+
+  font-size: 19px;
+}
+
+.ma-badge {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 25px;
+
+  padding:
+    0 9px;
+
+  border-radius:
+    999px;
+
+  background:
+    var(--ma-wine-light);
+
+  color:
+    var(--ma-wine);
+
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* =========================================================
+   RESPONSIVO
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .ma-grid-3,
+  .ma-grid-4 {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .ma-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 620px) {
+  .ma-container,
+  .ma-container-wide {
+    width:
+      calc(100% - 20px);
+  }
+
+  .ma-section {
+    padding-block: 38px;
+  }
+
+  .ma-grid-2,
+  .ma-grid-3,
+  .ma-grid-4 {
+    grid-template-columns:
+      1fr;
+  }
+
+  .ma-card-normal {
+    padding: 19px;
+  }
+
+  .ma-btn {
+    min-height: 46px;
+  }
+
+  .ma-page-header {
+    padding:
+      32px 0 22px;
+  }
 }

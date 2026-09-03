@@ -1,27 +1,20 @@
-import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+import SiteHeader from "@/components/SiteHeader";
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "M.A Confecções e Brindes",
+  title: "M.A. Confecções e Brindes",
   description:
-    "Confecções, brindes personalizados e soluções digitais M.A.",
-};
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  viewportFit: "cover",
+    "Camisetas, canecas, brindes personalizados, uniformes, linha Baby, Pet, Torcedor e muito mais.",
 };
 
 export default function RootLayout({
@@ -30,16 +23,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable}`}
-        style={{
-          margin: 0,
-          width: "100%",
-          minWidth: 0,
-          overflowX: "hidden",
-        }}
-      >
+    <html
+      lang="pt-BR"
+      data-scroll-behavior="smooth"
+      className={`${inter.className} ${inter.variable}`}
+    >
+      <body>
+        <SiteHeader />
+
         {children}
       </body>
     </html>
