@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { db } from "@/lib/db";
+import { allowed } from "@/lib/commerce/auth";
 
 export async function POST(request: Request) {
   try {
@@ -98,7 +99,9 @@ export async function POST(request: Request) {
         redirectTo:
           mustChangePassword
             ? "/alterar-senha"
-            : "/minha-conta",
+            : allowed(user.role, "dashboard")
+              ? "/admin"
+              : "/minha-conta",
 
         user: {
           id:

@@ -26,6 +26,12 @@ model User {
   updatedAt          DateTime @updatedAt
 
   sessions Session[]
+  designs CustomerDesign[]
+  assets StoredAsset[]
+  cart Cart?
+  addresses Address[]
+  orders Order[]
+  quotes QuoteRequest[]
 }
 
 model Session {
@@ -36,4 +42,325 @@ model Session {
 
   userId String
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+enum CommercialMode {
+  QUOTE_ONLY
+  CUSTOMIZABLE
+  READY_TO_SELL
+}
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PRODUCTION
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+enum QuoteStatus {
+  NEW
+  REVIEWING
+  PROPOSED
+  ACCEPTED
+  REJECTED
+}
+
+model Category {
+  id String @id @default(cuid())
+  name String
+  slug String @unique
+  description String @default("")
+  imageUrl String?
+  active Boolean @default(true)
+  position Int @default(0)
+  parentId String?
+  parent Category? @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children Category[] @relation("CategoryTree")
+  products Product[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([parentId, active, position])
+}
+model Product {
+  id String @id @default(cuid())
+  name String
+  slug String @unique
+  sku String @unique
+  shortDescription String @default("")
+  description String
+  mode CommercialMode
+  status ProductStatus @default(DRAFT)
+  categoryId String
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  priceCents Int?
+  salePriceCents Int?
+  costCents Int?
+  minimumQuantity Int @default(1)
+  leadDays Int?
+  weightGrams Int?
+  dimensions Json?
+  featured Boolean @default(false)
+  seoTitle String?
+  seoDescription String?
+  deletedAt DateTime?
+  revision Int @default(0)
+  images ProductImage[]
+  variants ProductVariant[]
+  options ProductOption[]
+  templates CustomizationTemplate[]
+  designs CustomerDesign[]
+  cartItems CartItem[]
+  orderItems OrderItem[]
+  quoteItems QuoteItem[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([categoryId, status, deletedAt])
+  @@index([featured, createdAt])
+}
+model ProductImage {
+  id String @id @default(cuid())
+  productId String
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url String
+  alt String @default("")
+  position Int @default(0)
+  @@index([productId, position])
+}
+model ProductVariant {
+  id String @id @default(cuid())
+  productId String
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  sku String @unique
+  name String
+  attributes Json
+  priceCents Int?
+  stockControlled Boolean @default(false)
+  stock Int @default(0)
+  lowStockThreshold Int @default(5)
+  active Boolean @default(true)
+  movements InventoryMovement[]
+  cartItems CartItem[]
+  orderItems OrderItem[]
+  designs CustomerDesign[]
+  @@index([productId, active])
+}
+model ProductOption {
+  id String @id @default(cuid())
+  productId String
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name String
+  values Json
+  @@index([productId])
+}
+model InventoryMovement {
+  id String @id @default(cuid())
+  variantId String
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  delta Int
+  reason String
+  actorId String
+  orderId String?
+  createdAt DateTime @default(now())
+  @@index([variantId, createdAt])
+}
+model CustomizationTemplate {
+  id String @id @default(cuid())
+  productId String
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  name String
+  baseImageUrl String
+  maxFileBytes Int @default(5242880)
+  active Boolean @default(true)
+  areas CustomizationArea[]
+  designs CustomerDesign[]
+  @@index([productId, active])
+}
+model CustomizationArea {
+  id String @id @default(cuid())
+  templateId String
+  template CustomizationTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  name String
+  x Float
+  y Float
+  width Float
+  height Float
+  printWidthMm Int?
+  printHeightMm Int?
+  allowText Boolean @default(true)
+  allowImage Boolean @default(true)
+  @@index([templateId])
+}
+model CustomerDesign {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  productId String
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variantId String
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  templateId String
+  template CustomizationTemplate @relation(fields: [templateId], references: [id], onDelete: Restrict)
+  composition Json
+  templateSnapshot Json
+  cartItems CartItem[]
+  createdAt DateTime @default(now())
+  @@index([userId, createdAt])
+}
+model StoredAsset {
+  id String @id @default(cuid())
+  ownerId String
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  mime String
+  bytes Int
+  storageKey String @unique
+  public Boolean @default(false)
+  createdAt DateTime @default(now())
+  @@index([ownerId])
+}
+model Cart {
+  id String @id @default(cuid())
+  userId String @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  items CartItem[]
+  updatedAt DateTime @updatedAt
+}
+model CartItem {
+  id String @id @default(cuid())
+  cartId String
+  cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variantId String
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  designId String?
+  design CustomerDesign? @relation(fields: [designId], references: [id], onDelete: Restrict)
+  quantity Int
+  @@index([cartId])
+}
+model Address {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  recipient String
+  postalCode String
+  street String
+  number String
+  complement String?
+  district String
+  city String
+  state String
+  createdAt DateTime @default(now())
+  @@index([userId])
+}
+model Order {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  requestKey String @unique
+  status OrderStatus @default(PENDING)
+  subtotalCents Int
+  totalCents Int
+  addressSnapshot Json
+  shippingStatus String @default("PENDING_QUOTE")
+  paymentStatus String @default("PENDING_INTEGRATION")
+  items OrderItem[]
+  history OrderStatusHistory[]
+  payments PaymentRecord[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+model OrderItem {
+  id String @id @default(cuid())
+  orderId String
+  order Order @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  productId String
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variantId String
+  variant ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  quantity Int
+  unitPriceCents Int
+  snapshot Json
+  @@index([orderId])
+}
+model OrderStatusHistory {
+  id String @id @default(cuid())
+  orderId String
+  order Order @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  status OrderStatus
+  actorId String
+  note String
+  createdAt DateTime @default(now())
+  @@index([orderId, createdAt])
+}
+model QuoteRequest {
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  status QuoteStatus @default(NEW)
+  message String
+  items QuoteItem[]
+  history QuoteHistory[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([status, createdAt])
+  @@index([userId])
+}
+model QuoteItem {
+  id String @id @default(cuid())
+  quoteId String
+  quote QuoteRequest @relation(fields: [quoteId], references: [id], onDelete: Restrict)
+  productId String
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  quantity Int
+  options Json
+  snapshot Json
+  @@index([quoteId])
+}
+model QuoteHistory {
+  id String @id @default(cuid())
+  quoteId String
+  quote QuoteRequest @relation(fields: [quoteId], references: [id], onDelete: Restrict)
+  status QuoteStatus
+  actorId String
+  note String
+  createdAt DateTime @default(now())
+  @@index([quoteId, createdAt])
+}
+model PaymentRecord {
+  id String @id @default(cuid())
+  orderId String
+  order Order @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  status String @default("PENDING")
+  amountCents Int
+  reference String @unique
+  method String
+  actorId String
+  createdAt DateTime @default(now())
+  @@index([orderId])
+}
+model StoreSettings {
+  id String @id @default("store")
+  businessName String @default("M.A. Confecções e Brindes")
+  contactEmail String?
+  purchasePolicy String @default("")
+  orderingEnabled Boolean @default(false)
+  updatedAt DateTime @updatedAt
+}
+model AuditLog {
+  id String @id @default(cuid())
+  actorId String
+  action String
+  entity String
+  entityId String
+  detail Json
+  createdAt DateTime @default(now())
+  @@index([actorId, createdAt])
+  @@index([entity, entityId])
 }

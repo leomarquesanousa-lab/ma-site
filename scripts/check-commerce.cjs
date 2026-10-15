@@ -1,0 +1,32 @@
+﻿// Targeted offline checks: no database, credentials, build or generated output.
+const fs = require('node:fs');
+const path = require('node:path');
+const assert = require('node:assert/strict');
+const ts = require('typescript');
+const original = require.extensions['.ts'];
+require.extensions['.ts'] = function(module, filename) {
+  if (!filename.includes(path.join('lib','commerce'))) return original ? original(module, filename) : (()=>{throw new Error('Unexpected import');})();
+  const result=ts.transpileModule(fs.readFileSync(filename,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020,esModuleInterop:true}});
+  module._compile(result.outputText,filename);
+};
+const v = require('../lib/commerce/validation.ts');
+assert.equal(v.price({priceCents:1000,salePriceCents:800},{priceCents:null}),800);
+assert.equal(v.price({priceCents:1000,salePriceCents:800},{priceCents:1200}),1200);
+assert.throws(()=>v.price({priceCents:null,salePriceCents:null},{priceCents:null}));
+for(const value of [-1,1.5,Infinity,'10'])assert.throws(()=>v.integer(value,'Quantity',1));
+assert.throws(()=>v.imageUrl('/../.env'));
+assert.throws(()=>v.imageUrl('javascript:alert(1)'));
+assert.throws(()=>v.imageUrl('/art.svg'));
+const area={id:'area',x:.1,y:.1,width:.8,height:.8,allowText:true,allowImage:false};
+const element={id:'element',areaId:'area',type:'text',value:'MA',x:.5,y:.5,width:.3,height:.2,rotation:0,color:'#781834'};
+assert.equal(v.composition([element],[area]).length,1);
+assert.throws(()=>v.composition([{...element,x:.95}],[area]));
+assert.throws(()=>v.composition([{...element,width:.8,height:.8,rotation:45}],[area]));
+assert.throws(()=>v.composition([{...element,type:'image',value:'/api/arquivos/private'}],[area]));
+assert.throws(()=>v.composition([{...element,rotation:NaN}],[area]));
+assert.throws(()=>v.composition([{...element,areaId:'other'}],[area]));
+const {imageMime}=require('../lib/commerce/storage.ts');
+assert.equal(imageMime(fs.readFileSync(path.join(__dirname,'../public/herohome-ma.png'))),'image/png');
+assert.throws(()=>imageMime(Buffer.from('<svg onload="alert(1)"/>')));
+require.extensions['.ts']=original;
+console.log('Targeted commerce domain checks passed (pricing, input validation, print bounds, upload signature).');

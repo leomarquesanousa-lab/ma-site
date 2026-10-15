@@ -1,0 +1,19 @@
+﻿"use client";
+import { useEffect, useState } from "react";
+import { commerceRequest, moneyLabel } from "./client";
+import styles from "@/app/commerce.module.css";
+type CartItem={id:string;quantity:number;designId:string|null;product:{name:string;slug:string;priceCents:number|null;salePriceCents:number|null;minimumQuantity:number};variant:{name:string;priceCents:number|null}};
+type Address={id:string;recipient:string;street:string;number:string;city:string;state:string};
+export default function CartWorkspace() {
+  const [items,setItems]=useState<CartItem[]>([]),[addresses,setAddresses]=useState<Address[]>([]),[addressId,setAddressId]=useState(""),[message,setMessage]=useState(""),[busy,setBusy]=useState(false),[loading,setLoading]=useState(true);
+  const [requestKey,setRequestKey]=useState("");
+  const load=async()=>{const [cart,addresses]=await Promise.all([commerceRequest<{items:CartItem[]}>("cart"),commerceRequest<Address[]>("addresses")]);setItems(cart.items);setAddresses(addresses);};
+  useEffect(()=>{const key=sessionStorage.getItem("ma-order-key")||crypto.randomUUID();sessionStorage.setItem("ma-order-key",key);setRequestKey(key);load().catch(e=>setMessage(e.message)).finally(()=>setLoading(false));},[]);
+  async function change(data:unknown){setBusy(true);setMessage("");try{await commerceRequest("cart",data);await load();}catch(e){setMessage(e instanceof Error?e.message:"Falha.");}finally{setBusy(false);}}
+  const cents=(i:CartItem)=>i.variant.priceCents??i.product.salePriceCents??i.product.priceCents??0;
+  return <><p role="status">{message}</p>{loading?<p>Carregando carrinho…</p>:<>
+    {!items.length&&<p className={styles.notice}>Seu carrinho está vazio. <a href="/catalogo">Explorar catálogo</a></p>}
+    <div className={styles.records}>{items.map(item=><article className={styles.record} key={item.id}><h2><a href={`/produtos/${item.product.slug}`}>{item.product.name}</a></h2><p>{item.variant.name} · {moneyLabel(cents(item))} por unidade</p>{item.designId&&<p>Projeto personalizado: {item.designId}</p>}<form className={styles.actions} onSubmit={e=>{e.preventDefault();const form=new FormData(e.currentTarget);change({id:item.id,quantity:Number(form.get("quantity"))});}}><label>Quantidade<input name="quantity" type="number" min={item.product.minimumQuantity} max={10000} defaultValue={item.quantity} required/></label><button disabled={busy}>Atualizar</button><button type="button" disabled={busy} onClick={()=>change({id:item.id,action:"remove"})}>Remover</button></form><strong>Subtotal: {moneyLabel(cents(item)*item.quantity)}</strong></article>)}</div>
+    {!!items.length&&<section className={styles.panel}><h2>Total de mercadorias: {moneyLabel(items.reduce((sum,item)=>sum+cents(item)*item.quantity,0))}</h2><p className={styles.notice}>Frete ainda não calculado. Pix, cartão e boleto aguardam integração. Esta etapa registra um pedido para atendimento, não cobra nem confirma pagamento. O valor mostrado inclui somente mercadorias e será revalidado no servidor.</p><label>Endereço<select value={addressId} onChange={e=>setAddressId(e.target.value)}><option value="">Selecione</option>{addresses.map(a=><option key={a.id} value={a.id}>{a.recipient} · {a.street}, {a.number} · {a.city}/{a.state}</option>)}</select></label><a href="/minha-conta/enderecos">Cadastrar endereço</a><div className={styles.actions}><button disabled={busy||!addressId||!requestKey} onClick={async()=>{if(!confirm("Registrar o pedido para atendimento, com frete e pagamento pendentes?"))return;setBusy(true);try{const order=await commerceRequest<{id:string}>("orders",{addressId,requestKey});setMessage(`Pedido registrado: ${order.id}. Nenhuma cobrança realizada.`);sessionStorage.removeItem("ma-order-key");setRequestKey(crypto.randomUUID());await load();}catch(e){setMessage(e instanceof Error?e.message:"Falha.");}finally{setBusy(false);}}}>Registrar pedido para atendimento</button></div></section>}
+  </>}</>;
+}

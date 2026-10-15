@@ -101,9 +101,8 @@ export default function CadastroPage() {
             </h1>
 
             <p>
-              Uma única conta para a
-              loja M.A. e para o
-              MA System.
+              Crie sua conta para acessar a
+              loja M.A. Confecções e Brindes.
             </p>
           </div>
 

@@ -39,3 +39,20 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Private original customer artwork (never serve directly from public/)
+/.ma-storage/
+
+# Local-only commerce target (contains no password)
+/.ma-commerce.local.json
+/.ma-local-init-result.json
+/.ma-local-admin-result.json
+
+# Private keys, database backups and storage inventories
+*.key
+*.p12
+*.pfx
+*.dump
+*.backup
+/backups/
+/.ma-r2-inventory/

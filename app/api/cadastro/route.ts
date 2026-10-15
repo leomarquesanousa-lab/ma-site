@@ -130,6 +130,7 @@ export async function POST(request: Request) {
           email,
           passwordHash,
           mustChangePassword: false,
+          role: "CUSTOMER",
         },
 
         select: {
