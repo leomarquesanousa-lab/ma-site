@@ -3,10 +3,11 @@ const fs=require('node:fs');
 const path=require('node:path');
 const {parseEnv}=require('node:util');
 const root=process.cwd();
-const projectKey=/^(DATABASE_URL|DIRECT_URL|SHADOW_DATABASE_URL|MA_RUNTIME|ASSET_STORAGE|HOMOLOGATION_.*|R2_.*|SMTP_.*|EMAIL_.*|NEXT_PUBLIC_.*|NEON_.*)$/;
+const projectKey=/^(DATABASE_URL|DIRECT_URL|SHADOW_DATABASE_URL|MA_RUNTIME|MA_HOSTED_PRODUCTION|ASSET_STORAGE|HOMOLOGATION_.*|R2_.*|SMTP_.*|EMAIL_.*|NEXT_PUBLIC_.*|NEON_.*)$/;
 let previousKeys=new Set();
 function readProjectEnv(){
- try{const file=process.env.MA_HOMOLOGATION==='1'?'.env.homologacao':'.env';const values=parseEnv(fs.readFileSync(path.join(root,file),'utf8').replace(/^\uFEFF/,''));if(file!=='.env')values.DATABASE_URL=require('./homologation-env.cjs').assertHomologation(values);return values;}
+ if(process.env.MA_HOSTED_PRODUCTION==='1')return require('./hosted-env.cjs').assertHostedProduction(Object.fromEntries(Object.entries(process.env).filter(([,v])=>typeof v==='string')));
+ try{const file=process.env.MA_HOMOLOGATION==='1'?'.env.homologacao':'.env';const values=parseEnv(fs.readFileSync(path.join(root,file),'utf8').replace(/^\uFEFF/,''));if(values.MA_HOSTED_PRODUCTION==='1')throw Error('HOSTED_FLAG_REQUIRES_PROCESS_ENV');if(file!=='.env')values.DATABASE_URL=require('./homologation-env.cjs').assertHomologation(values);return values;}
  catch{throw new Error('Não foi possível ler .env. Nenhuma configuração alternativa será carregada.');}
 }
 function loadProjectEnv(){

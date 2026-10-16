@@ -10,6 +10,12 @@ else secureNeonUrl(process.env.DATABASE_URL);
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["192.168.1.104"],
+  // Hosted production reads hPanel variables, never private files from disk.
+  ...(process.env.MA_HOSTED_PRODUCTION === "1" ? {
+    outputFileTracingExcludes: {
+      "/*": ["./.env*", "./backups/**/*", "./.ma-neon-restore/**/*", "./.ma-neon-activation/**/*", "./.npm-cache/**/*", "./.git/**/*", "./validation-guard.cjs"],
+    },
+  } : {}),
 };
 
 export default nextConfig;

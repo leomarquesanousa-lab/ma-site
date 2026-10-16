@@ -1,0 +1,4 @@
+# Applied migrations and pinned public CA must retain their exact checksums.
+prisma/migrations/**/migration.sql -text
+prisma/homologation-migrations/**/migration.sql -text
+prisma/certs/neon-root-ca.pem -text
