@@ -1,0 +1,19 @@
+# Produto em uma tela — checkpoint
+
+Formulário existente consolidado, sem segunda implementação: dados essenciais e imagens em duas colunas no desktop; informações avançadas/SEO recolhidas; variações e personalização integradas; ações Salvar rascunho / Salvar e publicar no rodapé sticky. Erros não limpam dados. Campos monetários novos usam reais e o parser decimal existente; API mantém compatibilidade com priceCents dos clientes anteriores.
+
+Produto, imagens/opções, variações, movimentos de estoque, versões de mockup e auditoria são salvos na mesma transação serializable. ACTIVE é validado após gravar as relações dentro dessa transação, eliminando a exigência de DRAFT intermediário. Falha desfaz todas as mudanças. Variante removida é inativada; não se apagam relações históricas. Estoque existente exige expectedStock quando alterado e atualização condicionada; concorrência é recusada, sem retry automático. Mockups alterados geram nova versão, preservando bases de projetos existentes. Uniformes continuam exclusivamente sob orçamento. Publicação exige categoria ativa e, quando aplicável, variante ativa e mockup classificado com área.
+
+Galeria administrativa reutiliza upload existente: drop de arquivos, seletor e referência HTTPS. Server valida URLs com a política pública existente e não baixa URLs arbitrárias. Imagens externas dependem de disponibilidade do fornecedor e são carregadas pelo navegador com no-referrer. Originais R2 e autorização preservados. Uploads acontecem antes da transação do cadastro; arquivo enviado e não vinculado após erro permanece armazenado para revisão, nunca apagado automaticamente.
+
+Página pública: galeria client-side com capa/ordem, imagem principal limitada, contain, miniaturas, dialog de ampliação e controles por teclado/nativos. Desktop em duas colunas, informações/compra à direita; descrição abaixo; mobile empilhado. Fluxos existentes de personalização/carrinho/orçamento mantidos. Não há promessa de renderização 3D ou exportação industrial.
+
+Validação realizada na homologação: hml-unified-1792114820137 (produto comum), hml-custom-unified-1792114820137 (personalizável). Ambos criados e publicados numa única requisição com variantes; preço em reais/centavos e estoque reabertos corretamente; mockup integrado criado; atualização de estoque e remoção/inativação de variante verificadas. Payload inválido rejeitado com rollback completo (produto inexistente após erro). GET das duas páginas públicas retornou 200 com galeria. Fixtures mantidas para revisão; não alterar dados do usuário nem limpar automaticamente.
+
+scripts/check-product-editor.cjs exercita handlers reais com transporte mockado: botões/status, payload integrado, preservação após erro, inicialização de variantes, miniaturas/capa/ampliação e drop de imagem. scripts/check-editor-metadata.cjs continua passando. TypeScript direcionado aos módulos alterados sem erros. Isso NÃO comprova revisão visual no navegador; não havia superfície de navegador conectada. Validação visual desktop/mobile e teste humano de toque/zoom permanecem pendentes.
+
+Arquivos desta consolidação: components/commerce/AdminWorkspace.tsx; ProductCompositionFields.tsx; StructuredField.tsx; ProductGallery.tsx; ProductGallery.module.css; lib/commerce/admin.ts; app/admin/admin.module.css; app/commerce.module.css; app/produtos/[slug]/page.tsx; scripts/check-product-editor.cjs; scripts/check-editor-metadata.cjs; este documento.
+
+Produção e arquivos .env preservados. Sem dependências novas, migrations, build completo, deploy, commit ou push. A migration de SEO anterior existe apenas na homologação: manter o bloqueio/documentação de rollout de produção até autorização específica.
+
+Para revisar: http://localhost:3002/admin e /produtos/hml-unified-1792114820137 ou /produtos/hml-custom-unified-1792114820137. Não testar pelo endereço 127.0.0.1, pois a checagem de origem do Next espera localhost nas submissões deste servidor.

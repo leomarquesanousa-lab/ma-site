@@ -1,0 +1,20 @@
+'use strict';
+const fs=require('node:fs'),ts=require('typescript'),vm=require('node:vm'),assert=require('node:assert/strict');
+let slots=[],cursor=0;const hooks={useState(v){const i=cursor++;if(!(i in slots))slots[i]=v;return[slots[i],n=>slots[i]=typeof n==='function'?n(slots[i]):n];},useRef(v){const i=cursor++;if(!(i in slots))slots[i]={current:v};return slots[i];},useId(){return'fixture';}};
+function load(file,imports){const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020,jsx:ts.JsxEmit.ReactJSX}}).outputText,{exports,require:id=>id==='react'?hooks:id==='react/jsx-runtime'?require(id):id.endsWith('.css')?{default:{}}:imports(id)});return exports;}
+const validation=load('lib/commerce/validation.ts',()=>({CommerceError:Error}));
+const Component=load('components/commerce/MockupAreaEditor.tsx',()=>validation).default;
+let areas=[];function render(url='/api/arquivos/fixture'){cursor=0;return Component({url,areas,disabled:false,onChange:value=>areas=value});}
+function find(n,p){if(Array.isArray(n)){for(const c of n){const r=find(c,p);if(r)return r;}}else if(n&&typeof n==='object'){if(p(n))return n;return find(n.props?.children,p);}}
+function frame(){return find(render(),n=>n.props?.onPointerMove);}
+const pointer=(x,y)=>({clientX:x,clientY:y,pointerId:1,preventDefault(){},stopPropagation(){},currentTarget:{setPointerCapture(){}}});
+render();slots[0].current={getBoundingClientRect:()=>({left:0,top:0,width:400,height:400}),setPointerCapture(){}};
+find(render(),n=>n.type==='button').props.onClick();frame().props.onPointerDown(pointer(40,80));frame().props.onPointerMove(pointer(240,280));frame().props.onPointerUp();
+assert.equal(areas.length,1);assert.equal(areas[0].x,.1);assert.equal(areas[0].y,.2);assert.ok(Math.abs(areas[0].width-.5)<1e-10);assert.ok(Math.abs(areas[0].height-.5)<1e-10);assert.equal(areas[0].printWidthMm,null);
+let overlay=find(render(),n=>n.props?.role==='button');overlay.props.onPointerDown(pointer(100,100));frame().props.onPointerMove(pointer(140,140));frame().props.onPointerUp();assert.ok(Math.abs(areas[0].x-.2)<1e-10);assert.ok(Math.abs(areas[0].width-.5)<1e-10);
+overlay=find(render(),n=>n.props?.role==='button');overlay.props.onKeyDown({key:'ArrowRight',shiftKey:false,preventDefault(){}});assert.ok(Math.abs(areas[0].x-.205)<1e-10);
+find(render(),n=>n.type==='button'&&n.props['aria-label']?.startsWith('Redimensionar')).props.onPointerDown(pointer(280,320));frame().props.onPointerMove(pointer(320,360));frame().props.onPointerUp();assert.ok(areas[0].width>0&&areas[0].x+areas[0].width<=1);assert.ok(areas[0].height>0&&areas[0].y+areas[0].height<=1);
+assert.ok(!find(render('http://localhost/image.png'),n=>n.type==='img'));assert.ok(!find(render(''),n=>n.type==='img'));
+const {selectVariantMockups}=load('lib/commerce/mockups.ts',()=>({}));const global={id:'g',name:'Front',productType:'MUG',variantIds:[]},specific={...global,id:'s',variantIds:['red']},back={...global,id:'b',name:'Back',variantIds:['blue']};assert.equal(selectVariantMockups([global,specific,back],'red')[0].id,'s');assert.equal(selectVariantMockups([global,specific,back],'blue').length,2);
+slots=[];let uploaded,reference;const Upload=load('components/commerce/CategoryImageField.tsx',id=>id.includes('validation')?validation:{uploadImage:async(file,purpose,productId)=>{uploaded={purpose,productId};return{url:'/api/arquivos/new-mockup'};}}).default;cursor=0;const uploader=Upload({value:'',purpose:'mockup',productId:'product-fixture',onChange:value=>reference=value,onUploadStateChange(){}});find(uploader,n=>n.props?.onDrop).props.onDrop({preventDefault(){},stopPropagation(){},dataTransfer:{files:[{type:'image/png',size:100}]}});
+setImmediate(()=>{assert.equal(uploaded.purpose,'mockup');assert.equal(uploaded.productId,'product-fixture');assert.equal(reference,'/api/arquivos/new-mockup');console.log('PASS draw/move/resize/keyboard bounds, safe URLs/empty state, variant/view selection and reused mockup upload handler. Offline fixtures, no actual upload/browser.');});

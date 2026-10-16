@@ -10,9 +10,12 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       const user = await currentUser();
       if (!user || user.mustChangePassword) return new Response(null, { status: 404 });
       if (user.id !== asset.ownerId) {
+        const libraryOriginal = allowed(user.role, "products") && await db.artwork.findFirst({ where: { originalAssetId: asset.id }, select: { id: true } });
+        if (!libraryOriginal) {
         if (!allowed(user.role, "orders")) return new Response(null, { status: 404 });
-        const ordered = await db.orderItem.findFirst({ where: { snapshot: { path: ["design", "composition"], array_contains: [{ value: `/api/arquivos/${asset.id}` }] } }, select: { id: true } });
+        const ordered = await db.orderItem.findFirst({ where: { OR: [{ snapshot: { path: ["design", "composition"], array_contains: [{ value: `/api/arquivos/${asset.id}` }] } }, { snapshot: { path: ["design", "composition"], array_contains: [{ sourceAssetId: asset.id }] } }] }, select: { id: true } });
         if (!ordered) return new Response(null, { status: 404 });
+        }
       }
     }
     const bytes = await assetStorage.get(asset.storageKey);

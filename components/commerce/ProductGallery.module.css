@@ -1,0 +1,25 @@
+.gallery { grid-area:gallery; min-width:0; width:100%; max-width:440px; justify-self:center; align-self:start; }
+.gallery .main { position:relative; display:block; width:100%; height:420px; max-height:440px; overflow:hidden; box-sizing:border-box; border:1px solid #e8e1df; border-radius:13px; background:#faf9f7; cursor:zoom-in; padding:18px; box-shadow:0 3px 18px #211b1d04; }
+.gallery .main:hover { background:#faf9f7; }
+.main img { width:100%; height:100%; object-fit:contain; display:block; }
+.main span { position:absolute; bottom:12px; right:12px; border-radius:16px; padding:6px 10px; background:#ffffffed; color:#781834; font-size:11px; font-weight:500; }
+.thumbnails { display:flex; justify-content:center; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.gallery .thumbnails button { box-sizing:border-box; flex:0 0 54px; width:54px; height:54px; min-height:44px; padding:4px; border:1px solid #e8e1df; border-radius:8px; background:#faf9f7; cursor:pointer; }
+.gallery .thumbnails button:hover { background:#f1edeb; }
+.gallery .thumbnails button[aria-pressed=true] { border-color:#781834; box-shadow:0 0 0 1px #781834; }
+.thumbnails img { width:100%; height:100%; object-fit:contain; display:block; }
+.gallery button:focus-visible { outline:3px solid #b89154; outline-offset:3px; }
+.dialog { position:fixed; inset:0; box-sizing:border-box; max-width:min(92vw,1100px); max-height:92vh; padding:16px; border:0; border-radius:13px; background:#f7f5f2; }
+.dialog::backdrop { background:#211b1dcc; }
+.gallery .dialog > button { display:flex; margin-left:auto; padding:10px; border:1px solid #e8e1df; border-radius:8px; background:white; color:#781834; }
+.dialog > img { display:block; width:100%; height:75vh; object-fit:contain; }
+.empty { grid-area:gallery; min-width:0; width:100%; max-width:440px; height:320px; display:grid; place-items:center; padding:24px; background:#faf9f7; border:1px solid #e8e1df; border-radius:13px; font-size:13px; color:#786b70; }
+@media(max-width:900px) { .gallery { max-width:460px; } .gallery .main { height:380px; } }
+@media(max-width:620px) { .gallery .main { height:clamp(240px,80vw,340px); padding:14px; } .gallery .thumbnails button { flex-basis:48px; width:48px; height:48px; } }
+
+/* Product visual column: thumbnails beside the photo; zoom remains unchanged. */
+.gallery { display:grid; grid-template-columns:48px minmax(0,1fr); grid-template-areas:"thumbs photo"; gap:10px; max-width:520px; }
+.gallery .main { grid-area:photo; height:320px; max-height:340px; padding:14px; }
+.thumbnails { grid-area:thumbs; flex-direction:column; justify-content:start; flex-wrap:nowrap; gap:8px; margin:0; max-height:320px; overflow-y:auto; overflow-x:hidden; padding:2px; }
+.gallery .thumbnails button { flex-basis:44px; width:44px; height:44px; min-height:44px; padding:3px; }
+@media(max-width:620px) { .gallery { grid-template-columns:minmax(0,1fr); grid-template-areas:"photo" "thumbs"; gap:10px; } .gallery .main { height:clamp(220px,72vw,300px); } .thumbnails { flex-direction:row; justify-content:center; flex-wrap:wrap; max-height:none; overflow:visible; } }

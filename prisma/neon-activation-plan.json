@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "project": "maconfeccoes",
+  "pooledHostname": "ep-soft-tooth-b62ei5ko-pooler.c-2.sa-east-1.aws.neon.tech",
+  "directHostname": "ep-soft-tooth-b62ei5ko.c-2.sa-east-1.aws.neon.tech",
+  "database": "neondb",
+  "schema": "public",
+  "schemaSha256": "07ed61c9a06eb624cb884b0d3b6f7ccc7abb8dc7b8914f82056dac9f90ca98fe",
+  "caSha256": "130c01d72c50929daf5983570bfa583c4c8f3df7454f905625d31c0f1e824396",
+  "migrations": [
+    {
+      "name": "202610130001_auth_baseline",
+      "sha256": "557c4e092c1fa4b8d41a079500622e795ae4ceab146559ddb5dd43547d92b863"
+    },
+    {
+      "name": "202610140001_commerce",
+      "sha256": "4da90b488acafbd350ae7e6bb5964dabe98e1eda6d68a0837d7b0ca2f6cf9375"
+    },
+    {
+      "name": "202610150001_studio",
+      "sha256": "64f02d6412b3cffbaee273f7f0492e76b625561323abcff8cd90200e584676db"
+    }
+  ],
+  "expectedTables": 25,
+  "expectedEnums": 5,
+  "expectedForeignKeys": 32,
+  "expectedSecondaryIndexes": 36,
+  "acceptedStricterArrayColumns": [
+    "CustomizationTemplate.variantIds",
+    "Artwork.tags",
+    "Artwork.compatibleTypes"
+  ]
+}

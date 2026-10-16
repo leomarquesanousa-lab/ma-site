@@ -12,7 +12,7 @@ export const publicProductSelect = {
   category: { select: { id: true, name: true, slug: true } },
   variants: { where: { active: true }, select: { id: true, name: true, attributes: true, priceCents: true, stock: true, stockControlled: true } },
   options: { select: { name: true, values: true } },
-  templates: { where: { active: true }, select: { id: true, name: true, baseImageUrl: true, maxFileBytes: true, areas: true } },
+  templates: { where: { active: true }, select: { id: true, name: true, productType: true, variantIds: true, baseImageUrl: true, maxFileBytes: true, areas: true } },
 } satisfies Prisma.ProductSelect;
 export const activeProductWhere = { status: "ACTIVE" as const, deletedAt: null, category: { active: true, OR: [{ parentId: null }, { parent: { active: true } }] } };
 export async function cartFor(userId: string) {
@@ -71,11 +71,13 @@ export async function placeOrder(userId: string, addressId: string, requestKey: 
     return order;
   }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
 }
-export async function changeOrder(actorId: string, id: string, status: "CONFIRMED" | "PRODUCTION" | "SHIPPED" | "DELIVERED" | "CANCELLED", note: string) {
+export async function changeOrder(actorId: string, id: string, status: "CONFIRMED" | "PRODUCTION" | "SHIPPED" | "DELIVERED" | "CANCELLED", note: string, artReviewed = false) {
   const transitions: Record<string, string[]> = { PENDING: ["CONFIRMED", "CANCELLED"], CONFIRMED: ["PRODUCTION", "CANCELLED"], PRODUCTION: ["SHIPPED", "CANCELLED"], SHIPPED: ["DELIVERED"], DELIVERED: [], CANCELLED: [] };
   return db.$transaction(async tx => {
     const order = await tx.order.findUnique({ where: { id }, include: { items: { include: { variant: true } } } });
     if (!order || !transitions[order.status].includes(status)) throw new CommerceError("Transição de pedido não permitida.");
+    if (status === "PRODUCTION" && order.items.some(i => { const snapshot=i.snapshot as Record<string,unknown>; return !!snapshot.design; }) && !artReviewed) throw new CommerceError("Confirme a conferência da arte, medidas e arquivos originais antes da produção.");
+    if (status === "PRODUCTION" && artReviewed) note = "[ARTE CONFERIDA] " + note;
     if (status === "CANCELLED") for (const item of order.items) if (item.snapshot && typeof item.snapshot === "object" && !Array.isArray(item.snapshot) && item.snapshot.stockReserved === true) {
       await tx.productVariant.update({ where: { id: item.variantId }, data: { stock: { increment: item.quantity } } });
       await tx.inventoryMovement.create({ data: { variantId: item.variantId, delta: item.quantity, actorId, orderId: id, reason: "Devolução de reserva por cancelamento" } });

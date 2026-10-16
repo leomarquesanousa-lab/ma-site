@@ -5,11 +5,15 @@ import { CommerceError } from "./errors";
 const hash = (value: string | Uint8Array) => createHash("sha256").update(value).digest("hex");
 const hmac = (key: string | Buffer, value: string) => createHmac("sha256", key).update(value).digest();
 export async function r2Request(method: "PUT" | "GET", key: string, bytes?: Uint8Array, mime?: string) {
+  if (process.env.MA_HOMOLOGATION === "1") {
+    const prefix = process.env.R2_TEST_PREFIX;
+    if (!prefix || !/^homologacao\/[a-z0-9-]{8,48}$/.test(prefix) || !["public", "private"].some(scope => key.startsWith(`${scope}/${prefix}/`))) throw new CommerceError("Objeto fora da área de homologação.", 403);
+  }
   const account = process.env.R2_ACCOUNT_ID;
   const access = process.env.R2_ACCESS_KEY_ID;
   const secret = process.env.R2_SECRET_ACCESS_KEY;
   const bucket = process.env.R2_BUCKET;
-  if (!account || !/^[a-f0-9]{32}$/.test(account) || !access || !secret || bucket !== "ma-confeccoes") {
+  if (!account || !/^[a-f0-9]{32}$/.test(account) || !access || !secret || !bucket || !/^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/.test(bucket)) {
     throw new CommerceError("R2 da MA Confecções não configurado. Upload indisponível.", 503);
   }
   if (!/^(public|private)\/[a-zA-Z0-9/_-]+$/.test(key) || key.includes("..")) throw new CommerceError("Objeto inválido.");

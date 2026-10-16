@@ -56,3 +56,10 @@ next-env.d.ts
 *.backup
 /backups/
 /.ma-r2-inventory/
+
+# Ephemeral, confirmation-gated remote migration staging
+/.ma-neon-activation/
+/.ma-neon-restore/
+/.env.homologacao
+!prisma/certs/neon-root-ca.pem
+/.npm-cache/

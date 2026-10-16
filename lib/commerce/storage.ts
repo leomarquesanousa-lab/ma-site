@@ -13,7 +13,8 @@ export const assetStorage: AssetStorage = {
     if (provider === "r2") {
       const scope = context.productId ? `products/${context.productId}` : `drafts/${context.ownerId}`;
       if (!/^[a-zA-Z0-9/_-]+$/.test(scope)) throw new CommerceError("Destino de arquivo inválido.");
-      const key = `${context.public ? "public" : "private"}/${scope}/${context.purpose}/${randomUUID()}`;
+      const testPrefix = process.env.MA_HOMOLOGATION === "1" ? `${process.env.R2_TEST_PREFIX}/` : "";
+      const key = `${context.public ? "public" : "private"}/${testPrefix}${scope}/${context.purpose}/${randomUUID()}`;
       await r2Request("PUT", key, bytes, context.mime);
       return `r2:${key}`;
     }

@@ -1,4 +1,6 @@
 'use strict';
+// Reject production .env before legacy prompts, reports or subprocesses.
+require('./local-env.cjs').loadLocalDatabaseUrl();
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');

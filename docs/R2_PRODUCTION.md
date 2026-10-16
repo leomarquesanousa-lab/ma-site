@@ -6,9 +6,9 @@ Integração R2 preparada no código, sem chamadas reais, credenciais configurad
 
 ## Configuração R2 (somente servidor)
 
-Variáveis privadas: `ASSET_STORAGE=r2`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET=ma-confeccoes`. Não usar prefixo NEXT_PUBLIC. Configurar manualmente em `.env.local` para homologar com banco local ou no gerenciador de segredos do futuro ambiente. Nunca copiar o `.env` do MA System.
+Variáveis privadas: `ASSET_STORAGE=r2`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET=maconfeccoes`. Não usar prefixo NEXT_PUBLIC. Configurar manualmente em `.env.local` para homologar com banco local ou no gerenciador de segredos do futuro ambiente. Nunca copiar o `.env` do MA System.
 
-1. Criar um bucket NOVO e exclusivo `ma-confeccoes` na conta Cloudflare apropriada. Se o nome já existir, verificar titularidade e finalidade; não reutilizar outro projeto.
+1. Usar o bucket exclusivo existente `maconfeccoes`, confirmado por consulta autenticada. O adaptador usa `R2_BUCKET`, validando o formato do nome; não criar outro bucket nem reutilizar outro projeto.
 2. Manter acesso público `r2.dev` e domínios públicos DESATIVADOS. O bucket contém originais privados; pastas não são barreira de autorização.
 3. Criar credenciais S3 de leitura/gravação restritas somente a esse bucket. Guardar o segredo fora do Git. Confirmar endpoint global padrão `<ACCOUNT_ID>.r2.cloudflarestorage.com`, região `auto`; endpoints jurisdicionais não são suportados por este adaptador.
 4. Configurar as cinco variáveis privadas e reiniciar o ambiente de homologação. Não é necessário CORS do bucket: o navegador envia à API da loja, não ao R2.

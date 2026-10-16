@@ -75,6 +75,8 @@ model Category {
   name String
   slug String @unique
   description String @default("")
+  seoTitle String @default("")
+  seoDescription String @default("")
   imageUrl String?
   active Boolean @default(true)
   position Int @default(0)
@@ -173,6 +175,8 @@ model CustomizationTemplate {
   productId String
   product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
   name String
+  productType String @default("UNCONFIGURED")
+  variantIds String[] @default([])
   baseImageUrl String
   maxFileBytes Int @default(5242880)
   active Boolean @default(true)
@@ -217,10 +221,35 @@ model StoredAsset {
   owner User @relation(fields: [ownerId], references: [id], onDelete: Restrict)
   mime String
   bytes Int
+  pixelWidth Int?
+  pixelHeight Int?
+  originalArtworks Artwork[] @relation("ArtworkOriginal")
+  thumbnailArtworks Artwork[] @relation("ArtworkThumbnail")
   storageKey String @unique
   public Boolean @default(false)
   createdAt DateTime @default(now())
   @@index([ownerId])
+}
+model Artwork {
+  id String @id @default(cuid())
+  name String
+  category String
+  subcategory String @default("")
+  tags String[]
+  compatibleTypes String[]
+  originalAssetId String
+  originalAsset StoredAsset @relation("ArtworkOriginal", fields: [originalAssetId], references: [id], onDelete: Restrict)
+  thumbnailAssetId String
+  thumbnailAsset StoredAsset @relation("ArtworkThumbnail", fields: [thumbnailAssetId], references: [id], onDelete: Restrict)
+  origin String
+  usageRights String
+  active Boolean @default(false)
+  revision Int @default(1)
+  preset Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([active, category])
+  @@index([originalAssetId])
 }
 model Cart {
   id String @id @default(cuid())

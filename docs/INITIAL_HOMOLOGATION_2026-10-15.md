@@ -1,0 +1,12 @@
+# Homologação inicial — 15/10/2026
+
+- Prisma Client 6.19.0 gerado com `npx.cmd --no-install prisma generate`, usando os engines já instalados via PRISMA_SCHEMA_ENGINE_BINARY/PRISMA_QUERY_ENGINE_LIBRARY. Nenhum download/instalação necessário. Schema gerado equivalente ao schema fonte após normalização de formatação feita pelo Prisma.
+- prisma.config.ts permite exclusivamente o comando generate sem exigir alvo local. Carrega somente .env. Comandos de banco continuam passando pelo guarda local original; fixtures offline confirmaram generate permitido e migrate/db bloqueados.
+- Neon aprovado maconfeccoes, neondb/public, TLS estrito com CA existente. Histórico das três migrations conferido com checksums e conclusão; prepare() também confere o hash do schema aprovado. Nenhuma migration reaplicada.
+- Consultas Prisma executadas dentro de transação READ ONLY: categorias com hierarquia; produtos com categoria/imagens/variantes/opções/templates/áreas; templates/áreas; Artwork; CustomerDesign; StoredAsset. Todas retornaram zero registros. Nenhum dado pessoal consultado ou exibido; nenhum registro criado ou modificado.
+- Adaptador R2 lê R2_BUCKET da configuração; .env confirma ASSET_STORAGE=r2 e R2_BUCKET=maconfeccoes. Nenhuma operação R2 repetida.
+- `node scripts/dev-local.cjs` recusou a conexão Neon antes de iniciar o Next, como previsto. Não houve build. Inicialização HTTP das APIs e navegação do painel permanecem NÃO HOMOLOGADAS: não contornar o guarda nem habilitar runtime de produção localmente para testes.
+- O catálogo público usa serviço server-side lib/commerce/catalog.ts, não um endpoint público separado de categorias/produtos. As consultas relacionais correspondentes passaram pelo Client. Rotas administrativas de commerce mantêm requirePermission; sem sessão administrativa não são acessíveis. Nenhum usuário/admin foi criado nesta tarefa.
+- Próxima etapa: disponibilizar configuração de desenvolvimento/homologação isolada, mantendo .env como fonte única; provisionar estrutura e conta administrativa mediante autorização específica nesse ambiente; então iniciar Next e testar HTTP/autenticação, categorias/imagens, produtos e personalizador (uma caneca e uma camiseta). Não usar dados nem banco do MA System.
+
+Arquivos de código alterados nesta etapa: prisma.config.ts. Arquivo de registro: este documento. Credenciais, .env/.env.local, schema e migrations preservados. Sem seed, build, deploy, commit ou push.

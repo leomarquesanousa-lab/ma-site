@@ -1,3 +1,4 @@
+import HeroCarousel from "@/components/HeroCarousel";
 import styles from "./premium.module.css";
 
 import { collectionUrl, collections, whatsapp as contact } from "./collections";
@@ -7,22 +8,7 @@ import FeaturedProducts from "@/components/commerce/FeaturedProducts";
 export default function Home() {
   return (
     <main id="conteudo" className={styles.home}>
-      <div className={styles.heroBand}><section className={`${styles.container} ${styles.hero}`} aria-labelledby="hero-title">
-        <div className={styles.heroCopy}>
-          <span className={styles.eyebrow}>M.A. / Uniformes profissionais</span>
-          <h1 id="hero-title">Uniformes que vestem<br /><span>a força da sua marca.</span></h1>
-          <p>Uniformes profissionais que traduzem a identidade da sua empresa. Produtos personalizados que levam essa identidade mais longe.</p>
-          <div className={styles.actions}>
-            <a className={styles.button} href="#orcamento">Solicitar orçamento <Arrow /></a>
-            <a className={styles.secondaryButton} href="#personalize">Conhecer a personalização <Arrow /></a>
-          </div>
-        </div>
-        <figure className={styles.heroMedia}>
-          <a href="/colecoes/uniformes" aria-label="Conhecer uniformes profissionais">
-            <img src="/herohome-ma.png" alt="Composição de camiseta vinho, polo preta com detalhes dourados, jaqueta e caneca personalizada" width="1448" height="1086" fetchPriority="high" />
-          </a>
-        </figure>
-      </section></div>
+      <HeroCarousel />
 
       <section className={styles.trust} aria-label="Nossa proposta">
         <div className={`${styles.container} ${styles.trustGrid}`}>

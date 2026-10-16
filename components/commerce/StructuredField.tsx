@@ -23,13 +23,23 @@ export function StructuredField({name,value,onChange,productId,onUploadStateChan
   </div>;
   const imageRows=Array.isArray(value)?value as Row[]:[];
   if(name==="images") {
+    async function uploadFiles(files:File[]) {
+        if(!files.length)return;
+        if(files.length+imageRows.length>20){setError("A galeria aceita até 20 imagens.");return;}
+        if(files.some(f=>!f.size||f.size>5242880||!["image/png","image/jpeg","image/webp"].includes(f.type))){setError("Selecione imagens PNG, JPEG ou WebP de até 5 MB.");return;}
+        setBusy(true);onUploadStateChange?.(true);setError("");const added:Row[]=[];
+        try{for(let i=0;i<files.length;i++){setProgress(`Enviando ${i+1} de ${files.length}…`);const asset=await uploadImage(files[i],"catalog",productId);added.push({url:asset.url,alt:""});}setProgress(`${added.length} imagem(ns) enviada(s). Salve o produto para aplicar.`);}
+        catch(e){setError(e instanceof Error?e.message:"Upload indisponível.");setProgress(`${added.length} imagem(ns) enviada(s) antes da interrupção.`);}
+        finally{if(added.length)onChange([...imageRows,...added]);setBusy(false);onUploadStateChange?.(false);}
+
+    }
     const move=(from:number,to:number)=>{const next=[...imageRows];const [item]=next.splice(from,1);next.splice(to,0,item);onChange(next);};
-    return <div className={styles.structured}>
+    return <div className={`${styles.structured} ${styles.galleryDropzone}`} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();if(!busy)void uploadFiles(Array.from(e.dataTransfer.files));}}>
       <p>Até 20 imagens. A primeira é a capa. Alterações na galeria são aplicadas ao salvar o produto.</p>
       <div className={styles.galleryManager}>{imageRows.map((row,index)=><fieldset key={index} className={styles.galleryItem} disabled={busy}>
         <legend>{index===0?"Capa do produto":`Imagem ${index+1}`}</legend>
-        {typeof row.url==="string" && /^\/(?!\/)/.test(row.url) && <img src={row.url} alt={String(row.alt||`Prévia ${index+1}`)} className={styles.galleryPreview}/>}
-        <label>Imagem (URL local ou upload)<input value={String(row.url??"")} onChange={e=>onChange(imageRows.map((r,i)=>i===index?{...r,url:e.target.value}:r))}/></label>
+        {typeof row.url==="string" && (/^\/(?!\/)/.test(row.url)||/^https:\/\//.test(row.url)) && <img src={row.url} alt={String(row.alt||`Prévia ${index+1}`)} className={styles.galleryPreview} referrerPolicy="no-referrer"/>}
+        <label>Imagem (upload ou URL HTTPS)<input value={String(row.url??"")} onChange={e=>onChange(imageRows.map((r,i)=>i===index?{...r,url:e.target.value}:r))}/></label>
         <label>Descrição acessível<input value={String(row.alt??"")} onChange={e=>onChange(imageRows.map((r,i)=>i===index?{...r,alt:e.target.value}:r))}/></label>
         <div className={styles.galleryActions}>
           <button type="button" disabled={index===0} onClick={()=>move(index,0)}>Definir capa</button>
@@ -39,15 +49,7 @@ export function StructuredField({name,value,onChange,productId,onUploadStateChan
         </div>
       </fieldset>)}</div>
       <button type="button" disabled={busy||imageRows.length>=20} onClick={()=>onChange([...imageRows,{url:"",alt:""}])}>Adicionar imagem por referência</button>
-      <label>Enviar imagens (PNG, JPEG ou WebP; até 5 MB cada)<input type="file" multiple disabled={busy||imageRows.length>=20} accept="image/png,image/jpeg,image/webp" onChange={async e=>{
-        const files=Array.from(e.target.files??[]);e.target.value="";if(!files.length)return;
-        if(files.length+imageRows.length>20){setError("A galeria aceita até 20 imagens.");return;}
-        if(files.some(f=>!f.size||f.size>5242880||!["image/png","image/jpeg","image/webp"].includes(f.type))){setError("Selecione imagens PNG, JPEG ou WebP de até 5 MB.");return;}
-        setBusy(true);onUploadStateChange?.(true);setError("");const added:Row[]=[];
-        try{for(let i=0;i<files.length;i++){setProgress(`Enviando ${i+1} de ${files.length}…`);const asset=await uploadImage(files[i],"catalog",productId);added.push({url:asset.url,alt:""});}setProgress(`${added.length} imagem(ns) enviada(s). Salve o produto para aplicar.`);}
-        catch(e){setError(e instanceof Error?e.message:"Upload indisponível.");setProgress(`${added.length} imagem(ns) enviada(s) antes da interrupção.`);}
-        finally{if(added.length)onChange([...imageRows,...added]);setBusy(false);onUploadStateChange?.(false);}
-      }}/></label>
+      <label>Enviar imagens (PNG, JPEG ou WebP; até 5 MB cada)<input type="file" multiple disabled={busy||imageRows.length>=20} accept="image/png,image/jpeg,image/webp" onChange={e=>{const files=Array.from(e.target.files??[]);e.target.value="";void uploadFiles(files);}}/></label>
       <p role="status" aria-live="polite">{progress}</p>{error&&<p role="alert" className={styles.error}>{error}</p>}
       <small>Remover desvincula a imagem ao salvar. O arquivo original é preservado para proteger referências e histórico.</small>
     </div>;

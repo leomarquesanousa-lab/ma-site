@@ -1,0 +1,23 @@
+'use strict';
+// Actual component handlers with mocked transport. No browser, DB or uploads.
+const fs=require('node:fs'),ts=require('typescript'),vm=require('node:vm'),assert=require('node:assert/strict');
+let slots=[],cursor=0,payload,shouldFail=false,done=0,uploads=0;
+const hooks={useState(initial){const i=cursor++;if(!(i in slots))slots[i]=initial;return[slots[i],value=>slots[i]=typeof value==='function'?value(slots[i]):value];},useRef(initial){const i=cursor++;if(!(i in slots))slots[i]={current:initial};return slots[i];},useEffect(){}};
+const transport={commerceRequest:async(path,body)=>{payload={path,body};if(shouldFail)throw Error('Fixture validation error');},uploadImage:async()=>{uploads++;return {url:'/api/arquivos/fixture'};}};
+const modules={};function load(file,extra=''){if(modules[file])return modules[file];const exports={};modules[file]=exports;const compiled=ts.transpileModule(fs.readFileSync(file,'utf8')+extra,{reportDiagnostics:true,compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020,jsx:ts.JsxEmit.ReactJSX}});assert.equal(compiled.diagnostics?.length??0,0);vm.runInNewContext(compiled.outputText,{exports,Set,require:id=>id==='react'?hooks:id==='react/jsx-runtime'?require(id):id.includes('currency')?load('lib/commerce/currency.ts'):id.includes('editor-metadata')?load('lib/commerce/editor-metadata.ts'):id.includes('ProductCompositionFields')?load('components/commerce/ProductCompositionFields.tsx'):id.endsWith('/client')?transport:id.endsWith('.css')?{default:{}}:{}});return exports;}
+function find(node,predicate){if(Array.isArray(node)){for(const child of node){const result=find(child,predicate);if(result)return result;}}else if(node&&typeof node==='object'){if(predicate(node))return node;return find(node.props?.children,predicate);}}
+function reset(){slots=[];cursor=0;}
+async function main(){
+ const form=load('components/commerce/AdminWorkspace.tsx','\nexport {RecordForm};');
+ const props={title:'Fixture',endpoint:'products',fields:[{key:'name',label:'Name'},{key:'basePrice',label:'Base price',type:'money'}],initial:{name:'Fixture',sku:'TEST',priceCents:2500,variants:[{id:'v',priceCents:2990,stock:3,active:true}],templates:[]},done(){done++;}};
+ function render(){cursor=0;return form.RecordForm(props);}
+ reset();let tree=render();assert.equal(find(tree,n=>n.props?.['aria-label']==='Base price').props.value,'25,00');
+ const composition=load('components/commerce/ProductCompositionFields.tsx');let embedded=find(tree,n=>n.type===composition.default);assert.equal(embedded.props.data.variants[0].price,'29,90');assert.equal(embedded.props.data.variants[0].expectedStock,3);
+ const controls=composition.default(embedded.props);find(controls,n=>n.type==='button'&&n.props.children==='Adicionar variação').props.onClick();
+ shouldFail=true;await render().props.onSubmit({preventDefault(){},nativeEvent:{submitter:{value:'ACTIVE'}}});assert.equal(done,0);assert.equal(payload.body.status,'ACTIVE');assert.equal(payload.body.variants.length,2);assert.equal(find(render(),n=>n.type===composition.default).props.data.variants.length,2);
+ shouldFail=false;await render().props.onSubmit({preventDefault(){},nativeEvent:{submitter:{value:'DRAFT'}}});assert.equal(payload.body.status,'DRAFT');assert.equal(done,1);
+ reset();const gallery=load('components/commerce/ProductGallery.tsx');const galleryProps={name:'Fixture',images:[{position:1,url:'/second.png',alt:''},{position:0,url:'/cover.png',alt:''}]};function galleryTree(){cursor=0;return gallery.default(galleryProps);}assert.equal(find(galleryTree(),n=>n.type==='img').props.src,'/cover.png');find(galleryTree(),n=>n.props?.['aria-label']==='Ver imagem 2').props.onClick();assert.equal(find(galleryTree(),n=>n.type==='img').props.src,'/second.png');let zoom=0;slots[1].current={showModal(){zoom++;},close(){zoom--;}};find(galleryTree(),n=>n.props?.['aria-label']==='Ampliar imagem do produto').props.onClick();assert.equal(zoom,1);find(galleryTree(),n=>n.props?.['aria-label']==='Fechar imagem ampliada').props.onClick();assert.equal(zoom,0);
+ reset();const structured=load('components/commerce/StructuredField.tsx');let images=[];const imageProps={name:'images',value:[],onChange:value=>images=value};const drop=structured.StructuredField(imageProps);drop.props.onDrop({preventDefault(){},dataTransfer:{files:[{size:20,type:'image/png'}]}});await new Promise(resolve=>setImmediate(resolve));assert.equal(uploads,1);assert.equal(images[0].url,'/api/arquivos/fixture');
+ console.log('PASS integrated form buttons/payload/error preservation, variant initialization, gallery ordering/thumbnails/zoom, drag-and-drop handler. Offline mocks, not browser validation.');
+}
+main().catch(e=>{console.error(e);process.exitCode=1;});

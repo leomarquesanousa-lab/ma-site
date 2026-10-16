@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "node scripts/dev-local.cjs",
     "dev:local": "node scripts/dev-local.cjs",
-    "build": "next build",
-    "start": "next start",
+    "build": "node scripts/run-next.cjs build",
+    "start": "node scripts/run-next.cjs start",
     "lint": "eslint"
   },
   "dependencies": {
@@ -17,7 +17,8 @@
     "prisma": "^6.19.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "sharp": "0.35.3"
+    "sharp": "0.35.3",
+    "three": "0.186.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -25,6 +26,7 @@
     "@types/nodemailer": "^8.0.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "0.186.0",
     "eslint": "^9",
     "eslint-config-next": "16.3.2",
     "tailwindcss": "^4",

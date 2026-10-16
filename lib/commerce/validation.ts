@@ -30,6 +30,18 @@ export function imageUrl(value: unknown) {
   throw new CommerceError("Use uma imagem local PNG, JPG ou WebP ou um upload autorizado.");
 }
 export const modes = ["QUOTE_ONLY", "CUSTOMIZABLE", "READY_TO_SELL"] as const;
+export function categoryImageUrl(value: unknown) {
+  const source = text(value, "Imagem da categoria", 2000);
+  if (source.startsWith("//")) throw new CommerceError("Informe a URL completa, começando com HTTPS.");
+  if (!/^https:\/\//i.test(source)) return imageUrl(source);
+  if (/[\u0000-\u0020\u007f\\]/.test(source)) throw new CommerceError("A URL contém caracteres inválidos. Use um endereço HTTPS completo.");
+  let url: URL;
+  try { url = new URL(source); } catch { throw new CommerceError("Informe uma URL HTTPS válida para a imagem."); }
+  if (url.protocol !== "https:" || !url.hostname || url.username || url.password) throw new CommerceError("Use uma URL HTTPS sem usuário ou senha.");
+  const hostname = url.hostname.toLowerCase().replace(/\.$/, "");
+  if (!hostname.includes(".") || hostname.includes(":") || /^\d+\.\d+\.\d+\.\d+$/.test(hostname) || /(^|\.)(localhost|local|internal)$/.test(hostname)) throw new CommerceError("Use um domínio público HTTPS, sem endereços IP ou hosts locais.");
+  return url.href;
+}
 export const statuses = ["DRAFT", "ACTIVE", "INACTIVE", "ARCHIVED"] as const;
 export function price(product: { priceCents: number | null; salePriceCents: number | null }, variant: { priceCents: number | null }) {
   const cents = variant.priceCents ?? product.salePriceCents ?? product.priceCents;
@@ -37,11 +49,13 @@ export function price(product: { priceCents: number | null; salePriceCents: numb
   return integer(cents, "Preço");
 }
 export function formatMoney(cents: number) { return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }); }
-export type DesignElement = { id: string; areaId: string; type: "text" | "image"; value: string; x: number; y: number; width: number; height: number; rotation: number; color: string };
-export type PrintArea = { id: string; x: number; y: number; width: number; height: number; allowText: boolean; allowImage: boolean };
+export const studioFonts = ["Arial", "Georgia", "Verdana", "Courier New"] as const;
+export type DesignElement = { applicationMode?:'FULL_WRAP'|'FULL_WRAP_COVER'|'SAFE_CONTAIN'|'CENTERED'; imageBackground?:string; imageCrop?:{x:number;y:number;width:number;height:number}; templateId?: string; fontFamily?: string; artworkId?: string; presetIndex?: number; locked?: boolean; pixelWidth?: number; pixelHeight?: number; sourceAssetId?: string; id: string; areaId: string; type: "text" | "image"; value: string; x: number; y: number; width: number; height: number; rotation: number; color: string };
+export type PrintArea = { id: string; x: number; y: number; width: number; height: number; allowText: boolean; allowImage: boolean; printWidthMm?: number | null; printHeightMm?: number | null };
 export function composition(value: unknown, areas: PrintArea[]): DesignElement[] {
+  const ids = new Set<string>();
   return list(value, "Composição", 30).map((raw) => {
-    const e = object(raw); const area = areas.find(a => a.id === e.areaId);
+    const e = object(raw); if(ids.has(String(e.id)))throw new CommerceError("Elemento duplicado."); ids.add(String(e.id)); const area = areas.find(a => a.id === e.areaId);
     if (!area) throw new CommerceError("Área de impressão inválida.");
     const type = choice(e.type, ["text", "image"], "Elemento");
     if ((type === "text" && !area.allowText) || (type === "image" && !area.allowImage)) throw new CommerceError("Tipo de arte não permitido.");
@@ -55,6 +69,13 @@ export function composition(value: unknown, areas: PrintArea[]): DesignElement[]
     const color = text(e.color, "Cor", 7); if (!/^#[0-9a-f]{6}$/i.test(color)) throw new CommerceError("Cor inválida.");
     const content = text(e.value, "Conteúdo", type === "text" ? 200 : 200);
     if (type === "image" && !/^\/api\/arquivos\/[a-zA-Z0-9_-]+$/.test(content)) throw new CommerceError("Imagem não autorizada.");
-    return { id: text(e.id, "Elemento", 80), areaId: area.id, type, value: content, x, y, width, height, rotation, color };
+    const applicationMode=e.applicationMode==null?undefined:choice(e.applicationMode,['FULL_WRAP','FULL_WRAP_COVER','SAFE_CONTAIN','CENTERED'],'Aplicação');
+    let imageCrop:DesignElement['imageCrop'];
+    if(e.imageCrop!=null){const crop=object(e.imageCrop);if(type!=='image'||['x','y','width','height'].some(key=>typeof crop[key]!=='number'||!Number.isFinite(crop[key])||Number(crop[key])<0||Number(crop[key])>1)||Number(crop.width)<=0||Number(crop.height)<=0||Number(crop.x)+Number(crop.width)>1+1e-9||Number(crop.y)+Number(crop.height)>1+1e-9)throw new CommerceError('Recorte da imagem inválido.');imageCrop={x:Number(crop.x),y:Number(crop.y),width:Number(crop.width),height:Number(crop.height)};}
+    if(applicationMode&&type!=='image')throw new CommerceError('Modo de aplicação reservado a imagens.');
+    if((applicationMode==='FULL_WRAP'||applicationMode==='FULL_WRAP_COVER')&&!imageCrop)throw new CommerceError('FULL_WRAP exige um recorte válido.');
+    const imageBackground=e.imageBackground==null?undefined:text(e.imageBackground,'Fundo',7);if(imageBackground&&(!/^#[0-9a-f]{6}$/i.test(imageBackground)||type!=='image'))throw new CommerceError('Fundo da imagem inv\u00e1lido.');
+    if(applicationMode==='SAFE_CONTAIN'&&imageCrop)throw new CommerceError('SAFE_CONTAIN n\u00e3o permite recorte.');
+    return { ...(imageBackground?{imageBackground}:{}),...(applicationMode?{applicationMode}:{}),...(imageCrop?{imageCrop}:{}),...(e.templateId ? {templateId:text(e.templateId,"Vista",100)} : {}), ...(e.artworkId ? {artworkId:text(e.artworkId,"Arte",100)} : {}), ...(e.presetIndex != null ? {presetIndex:integer(e.presetIndex,"Elemento do modelo",0,9)} : {}), fontFamily: choice(e.fontFamily ?? "Arial", studioFonts, "Fonte"), id: text(e.id, "Elemento", 80), areaId: area.id, type, value: content, x, y, width, height, rotation, color };
   });
 }
