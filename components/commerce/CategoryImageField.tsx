@@ -55,7 +55,7 @@ export default function CategoryImageField({ value, onChange, onUploadStateChang
       onChange(asset.url); setFailedUrl("");
       setStatus(purpose === "mockup" ? "Mockup enviado. Salve o produto para aplicar." : "Imagem enviada. Salve as alterações para aplicar.");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Não foi possível enviar. Tente novamente."); setStatus("");
+      setError(`Falha no upload da imagem: ${e instanceof Error ? e.message : "Não foi possível enviar. Tente novamente."}`); setStatus("");
     } finally {
       setPendingPreview(""); inFlight.current = false; setBusy(false); onUploadStateChange(false);
     }

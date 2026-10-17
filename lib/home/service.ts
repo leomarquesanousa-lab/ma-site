@@ -8,6 +8,7 @@ export async function homeBanners() {
   const ready=await db.$queryRaw<{name:string|null}[]>`SELECT to_regclass('public."HomeContent"')::text AS name`;
   if(!ready[0]?.name){console.warn('HOME_BANNERS_FALLBACK',{operation:'read_home_banners',code:'HOME_CONTENT_MISSING'});return fallback(true);}
   const rows=await db.$queryRaw<{banners:unknown;revision:number}[]>`SELECT banners,revision FROM public."HomeContent" WHERE id='home'`;
+  if(!rows.length)console.warn('HOME_BANNERS_FALLBACK',{operation:'read_home_banners',code:'HOME_CONTENT_UNSAVED'});
   return {banners:rows.length?parseBanners(rows[0].banners):initialBanners(),revision:rows[0]?.revision??0,provisioningRequired:false,readOnly:false,persistenceMessage:''};
  }catch(error){
   const e=error as {code?:string;errorCode?:string;meta?:{code?:string}};

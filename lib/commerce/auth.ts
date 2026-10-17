@@ -33,5 +33,15 @@ export async function requirePermission(permission: Permission) {
 }
 export function sameOrigin(request: Request) {
   const origin = request.headers.get("origin");
+  if(process.env.MA_HOSTED_PRODUCTION==='1'&&process.env.MA_RUNTIME==='production'&&process.env.NODE_ENV==='production'){
+    // TLS terminates at the hosting proxy. Authorize the configured public
+    // origin, never a client-controlled Host or X-Forwarded-* header.
+    let expected:URL;
+    try{expected=new URL(process.env.NEXT_PUBLIC_SITE_URL??'');}
+    catch{throw new CommerceError('Configure NEXT_PUBLIC_SITE_URL com a URL HTTPS oficial.',503);}
+    if(expected.protocol!=='https:'||expected.username||expected.password)throw new CommerceError('NEXT_PUBLIC_SITE_URL precisa ser a URL HTTPS oficial.',503);
+    if(origin!==expected.origin)throw new CommerceError('Origem não autorizada.',403);
+    return;
+  }
   if (!origin || origin !== new URL(request.url).origin) throw new CommerceError("Origem não autorizada.", 403);
 }

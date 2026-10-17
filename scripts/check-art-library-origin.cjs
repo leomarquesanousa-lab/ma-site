@@ -5,14 +5,15 @@ function load(file,imports,env={}){const m={exports:{}};vm.runInNewContext(ts.tr
 class CommerceError extends Error{constructor(message,status=400){super(message);this.status=status;}}
 const sameOrigin=request=>{if(request.headers.get('origin')!==new URL(request.url).origin)throw new CommerceError('Origem não autorizada.',403);};
 const env={MA_HOSTED_PRODUCTION:'1',MA_RUNTIME:'production',NODE_ENV:'production',NEXT_PUBLIC_SITE_URL:'https://maconfeccoes.com.br'};
-const {assertArtLibraryOrigin}=load('lib/commerce/art-library-origin.ts',{'./auth':{CommerceError,sameOrigin}},env);
+const sharedAuth=environment=>load('lib/commerce/auth.ts',{'next/headers':{},'@/lib/db':{},'./errors':{CommerceError}},environment);
+const {assertArtLibraryOrigin}=load('lib/commerce/art-library-origin.ts',{'./auth':sharedAuth(env)},env);
 const request=origin=>new Request('http://internal-host:3000/api/art-library',{method:'POST',headers:{...(origin?{origin}:{}),'x-forwarded-host':'maconfeccoes.com.br','content-type':'application/json'},body:JSON.stringify({action:'sync',mapping:[]})});
 assert.doesNotThrow(()=>assertArtLibraryOrigin(request('https://maconfeccoes.com.br')));
 for(const origin of ['https://evil.example','http://maconfeccoes.com.br',null])assert.throws(()=>assertArtLibraryOrigin(request(origin)),e=>e.status===403);
-const local=load('lib/commerce/art-library-origin.ts',{'./auth':{CommerceError,sameOrigin}},{});
+const local=load('lib/commerce/art-library-origin.ts',{'./auth':sharedAuth({})},{});
 assert.doesNotThrow(()=>local.assertArtLibraryOrigin(new Request('http://localhost:3003/api/art-library',{headers:{origin:'http://localhost:3003'}})));
 assert.throws(()=>local.assertArtLibraryOrigin(request('https://maconfeccoes.com.br')));
-const missing=load('lib/commerce/art-library-origin.ts',{'./auth':{CommerceError,sameOrigin}},{...env,NEXT_PUBLIC_SITE_URL:''});assert.throws(()=>missing.assertArtLibraryOrigin(request(env.NEXT_PUBLIC_SITE_URL)),e=>e.status===503);
+const missing=load('lib/commerce/art-library-origin.ts',{'./auth':sharedAuth({...env,NEXT_PUBLIC_SITE_URL:''})},{...env,NEXT_PUBLIC_SITE_URL:''});assert.throws(()=>missing.assertArtLibraryOrigin(request(env.NEXT_PUBLIC_SITE_URL)),e=>e.status===503);
 let permission=true,calls=0,dbError=null;
 const api=load('app/api/art-library/route.ts',{
  'next/server':{NextResponse:{json:(value,init)=>Response.json(value,init)}},'@/lib/db':{db:{}},
