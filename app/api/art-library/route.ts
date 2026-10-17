@@ -1,12 +1,20 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { CommerceError, requirePermission, requireUser, sameOrigin } from '@/lib/commerce/auth';
+import { CommerceError, requirePermission, requireUser } from '@/lib/commerce/auth';
+import { assertArtLibraryOrigin } from '@/lib/commerce/art-library-origin';
 import { artworkPublicSelect } from '@/lib/commerce/artwork';
 import { libraryAuthorizations, libraryOverview, syncLibrary, configureLibrary } from '@/lib/commerce/r2-library';
 import { boundedBody } from '@/lib/commerce/storage';
 export const runtime='nodejs';
 const json=(value:unknown,status=200)=>NextResponse.json(value,{status,headers:{'Cache-Control':'private, no-store'}});
-function failure(error:unknown){console.error('ART_LIBRARY_FAILED',{code:error instanceof CommerceError?'LIBRARY_REQUEST_REJECTED':'LIBRARY_UNAVAILABLE'});return json({error:error instanceof CommerceError?error.message:'Biblioteca indisponível. Tente novamente.'},error instanceof CommerceError?error.status:503);}
+function failure(error:unknown){
+ const e=error as {code?:string;errorCode?:string;meta?:{code?:string}};
+ const raw=e?.code??e?.errorCode,code=/^P\d{4}$/.test(raw??'')?raw!:error instanceof CommerceError?'LIBRARY_REQUEST_REJECTED':'LIBRARY_UNAVAILABLE';
+ const messages:Record<string,string>={P1000:'Falha de autenticação no banco.',P1001:'Banco indisponível ou inacessível.',P1011:'Falha na validação TLS do banco.',P2021:'Tabela da biblioteca ausente. Confira as migrations aplicadas.',P2022:'Coluna da biblioteca ausente. Confira a compatibilidade do schema.',P2028:'A transação da biblioteca não pôde ser concluída no prazo. Tente novamente.',P2002:'Conflito de registros na sincronização. Tente novamente.'};
+ const denied=code==='P2010'&&e.meta?.code==='42501';
+ console.error('ART_LIBRARY_FAILED',{code,...(denied?{sqlState:'42501'}:{})});
+ return json({error:error instanceof CommerceError?error.message:denied?'Permissão de banco insuficiente para sincronizar.':messages[code]??'Biblioteca indisponível. Consulte o código do erro nos logs do servidor.',code},error instanceof CommerceError?error.status:503);
+}
 export async function GET(request:Request){
  try{
   const url=new URL(request.url);
@@ -32,4 +40,4 @@ export async function GET(request:Request){
   return json({items,total,groups,page,hasMore:(page+1)*24<total});
  }catch(e){return failure(e);}
 }
-export async function POST(request:Request){try{sameOrigin(request);const actor=await requirePermission('products');const body=JSON.parse(new TextDecoder().decode(await boundedBody(request,65536)));if(body.action==='configure')return json(await configureLibrary(actor.id,body.mapping));if(body.action!=='sync')throw new CommerceError('Ação inválida.');return json(await syncLibrary(actor.id,body.mapping??[]));}catch(e){return failure(e);}}
+export async function POST(request:Request){try{assertArtLibraryOrigin(request);const actor=await requirePermission('products');const body=JSON.parse(new TextDecoder().decode(await boundedBody(request,65536)));if(body.action==='configure')return json(await configureLibrary(actor.id,body.mapping));if(body.action!=='sync')throw new CommerceError('Ação inválida.');return json(await syncLibrary(actor.id,body.mapping??[]));}catch(e){return failure(e);}}
