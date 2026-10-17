@@ -1,7 +1,6 @@
 "use client";
 import { centsToReais } from "@/lib/commerce/currency";
-import CategoryImageField from "./CategoryImageField";
-import MockupAreaEditor from "./MockupAreaEditor";
+import PersonalizationModelField from "./PersonalizationModelField";
 import styles from "@/app/admin/admin.module.css";
 type Row=Record<string,unknown>;
 export function editableVariants(value:unknown):Row[]{return Array.isArray(value)?value.map(v=>({...v,price:centsToReais(v.priceCents),useProductPrice:v.priceCents==null,expectedStock:v.stock})):[];}
@@ -9,7 +8,6 @@ export function editableTemplates(value:unknown,variants:unknown):Row[]{const ro
 export default function ProductCompositionFields({data,onChange,onUploadStateChange,disabled,error=""}:{data:Row;onChange:(key:string,value:unknown)=>void;onUploadStateChange:(busy:boolean)=>void;disabled:boolean;error?:string}){
  const variants=Array.isArray(data.variants)?data.variants as Row[]:[],templates=Array.isArray(data.templateDrafts)?data.templateDrafts as Row[]:[];
  const variant=(index:number,patch:Row)=>onChange("variants",variants.map((v,i)=>i===index?{...v,...patch}:v));
- const template=(index:number,patch:Row)=>onChange("templateDrafts",templates.map((v,i)=>i===index?{...v,...patch,dirty:true}:v));
  return <>
   <section className={styles.compositionSection}><header><h3>Variações e estoque</h3><p>Cadastre as opções aqui. Remover uma opção salva a inativa, preservando o histórico.</p></header>
    {/varia|estoque|sku|atributo/i.test(error)&&<p role="alert">{error}</p>}
@@ -24,18 +22,6 @@ export default function ProductCompositionFields({data,onChange,onUploadStateCha
    </div><button type="button" onClick={()=>onChange("variants",variants.filter((_,i)=>i!==index))}>Remover opção</button></fieldset>)}
    <button type="button" disabled={disabled||variants.length>=30} onClick={()=>onChange("variants",[...variants,{name:variants.length?"":"Padrão",sku:data.sku?`${data.sku}-${variants.length+1}`:"",attributes:{},price:"",useProductPrice:true,stockControlled:false,stock:0,lowStockThreshold:5,active:true}])}>Adicionar variação</button>
   </section>
-  {data.mode==="CUSTOMIZABLE"&&<details className={styles.compositionSection}><summary>Mockup de personalização</summary>{!templates.some(t=>t.remove!==true&&t.baseImageUrl&&Array.isArray(t.areas)&&t.areas.length)&&<p role="status">Configure o mockup deste produto</p>}<p>Escolha uma imagem-base independente das fotos comerciais, associe as variantes e desenhe a impressão. Arquivos anteriores são preservados.</p>
-   {templates.filter(t=>t.remove!==true).map(t=>{const index=templates.indexOf(t),areas=Array.isArray(t.areas)?t.areas as Row[]:[];return <fieldset className={styles.variantCard} key={String(t.id??index)} disabled={disabled}><legend>Vista {index+1}</legend><div className={styles.compactGrid}><label>Nome da vista<input required value={String(t.name??"")} onChange={e=>template(index,{name:e.target.value})}/></label><label>Produto<select required value={String(t.productType??"")} onChange={e=>template(index,{productType:e.target.value})}><option value="">Selecione</option><option value="MUG">Canecas e copos (2D)</option><option value="SHIRT">Camiseta</option></select></label></div>
-    <CategoryImageField purpose="mockup" showPreview={false} value={t.baseImageUrl} productId={typeof data.id==="string"?data.id:undefined} disabled={disabled} onUploadStateChange={onUploadStateChange} onChange={value=>template(index,{baseImageUrl:value})}/>
-    {templates.some(other=>other!==t&&other.remove!==true&&other.baseImageUrl)&&<label>Reutilizar imagem de outra vista<select value="" onChange={event=>{if(event.target.value)template(index,{baseImageUrl:event.target.value});}}><option value="">Escolha uma imagem já cadastrada</option>{[...new Map(templates.filter(other=>other!==t&&other.remove!==true&&other.baseImageUrl).map(other=>[String(other.baseImageUrl),String(other.name||"Vista sem nome")])).entries()].map(([url,name])=><option key={url} value={url}>{name}</option>)}</select></label>}
-    <fieldset><legend>Variantes desta vista</legend><label><input type="checkbox" checked={!Array.isArray(t.variantSkus)||!t.variantSkus.length} onChange={e=>template(index,{variantSkus:e.target.checked?[]:variants.map(v=>v.sku).filter(Boolean)})}/> Todas as variantes</label><div className={styles.compactGrid}>{variants.map((v,i)=><label key={String(v.id??i)}><input type="checkbox" disabled={!v.sku} checked={Array.isArray(t.variantSkus)&&t.variantSkus.includes(v.sku)} onChange={e=>{const selected=Array.isArray(t.variantSkus)?t.variantSkus:[];template(index,{variantSkus:e.target.checked?[...selected,v.sku]:selected.filter(sku=>sku!==v.sku)});}}/>{String(v.name||v.sku||'Preencha o SKU da variante')}</label>)}</div><small>Nenhuma seleção significa todas as variantes.</small></fieldset>
-    <MockupAreaEditor url={String(t.baseImageUrl??'')} areas={areas} disabled={disabled} onChange={value=>template(index,{areas:value})}/>
-
-    {areas.map((area,i)=><fieldset key={i}><legend>Área {i+1}</legend><div className={styles.compactGrid}><label>Nome<input required value={String(area.name??"")} onChange={e=>template(index,{areas:areas.map((a,j)=>i===j?{...a,name:e.target.value}:a)})}/></label>
-     {[["x","Posição horizontal (%)"],["y","Posição vertical (%)"],["width","Largura (%)"],["height","Altura (%)"],["printWidthMm","Impressão: largura (mm)"],["printHeightMm","Impressão: altura (mm)"]].map(([key,label])=><label key={key}>{label}<input type="number" min={key.startsWith("print")?1:0} max={key.startsWith("print")?100000:100} step={key.startsWith("print")?1:0.1} required value={area[key]==null?"":key.startsWith("print")?Number(area[key]):Math.round(Number(area[key])*1000)/10} onChange={e=>template(index,{areas:areas.map((a,j)=>i===j?{...a,[key]:e.target.value===""?null:Number(e.target.value)/(key.startsWith("print")?1:100)}:a)})}/></label>)}
-     {["allowText","allowImage"].map(key=><label key={key}><input type="checkbox" checked={area[key]===true} onChange={e=>template(index,{areas:areas.map((a,j)=>i===j?{...a,[key]:e.target.checked}:a)})}/>{key==="allowText"?"Permitir texto":"Permitir imagens"}</label>)}</div><button type="button" onClick={()=>template(index,{areas:areas.filter((_,j)=>i!==j)})}>Remover área</button></fieldset>)}
-    <button type="button" onClick={()=>template(index,{areas:[...areas,{name:"Área de impressão",x:0.1,y:0.1,width:0.8,height:0.8,allowText:true,allowImage:true,printWidthMm:null,printHeightMm:null}]})}>Adicionar área</button><button type="button" onClick={()=>t.id?template(index,{remove:true}):onChange("templateDrafts",templates.filter((_,i)=>i!==index))}>Remover vista</button>
-   </fieldset>;})}<button type="button" disabled={disabled||templates.length>=10} onClick={()=>onChange("templateDrafts",[...templates,{name:"",productType:"",baseImageUrl:"",maxFileBytes:5242880,variantSkus:[],areas:[],dirty:true}])}>Adicionar vista</button>
-  </details>}
+  {data.mode==="CUSTOMIZABLE"&&<section className={styles.compositionSection}><header><h3>Modelo de personalização</h3></header>{/mockup|modelo|vista/i.test(error)&&<p role="alert">{error}</p>}<PersonalizationModelField value={data.personalizationModel} templates={templates} disabled={disabled} onChange={value=>onChange("personalizationModel",value)}/></section>}
  </>;
 }

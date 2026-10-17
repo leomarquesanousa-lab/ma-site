@@ -8,6 +8,13 @@ export function text(value: unknown, label: string, max = 500, optional = false)
   if (typeof value !== "string" || !value.trim() || value.trim().length > max) throw new CommerceError(`${label}: valor obrigatório ou inválido.`);
   return value.trim();
 }
+export function productSummary(value:unknown):string {
+  if(value===undefined||value===null)return '';
+  if(typeof value!=='string')throw new CommerceError('Resumo: informe um texto válido ou deixe o campo vazio.');
+  const summary=value.trim();
+  if(summary.length>500)throw new CommerceError(`Resumo: use no máximo 500 caracteres (recebidos ${summary.length}).`);
+  return summary;
+}
 export function integer(value: unknown, label: string, min = 0, max = 100000000): number {
   if (typeof value !== "number" || !Number.isSafeInteger(value) || value < min || value > max) throw new CommerceError(`${label}: número inteiro entre ${min} e ${max}.`);
   return value;

@@ -4,7 +4,8 @@ import { CommerceError } from "./auth";
 import { metadataSuggestions } from "./editor-metadata";
 import { reaisToCents } from "./currency";
 import { selectVariantMockups } from "./mockups";
-import { categoryImageUrl, choice, flag, imageUrl, integer, list, modes, money, object, slug, statuses, text } from "./validation";
+import {resolvePersonalizationModel} from './personalization-models';
+import { categoryImageUrl, choice, flag, imageUrl, integer, list, modes, money, object, slug, statuses, text, productSummary } from "./validation";
 async function transact<T>(transaction: Prisma.TransactionClient | undefined, action: (tx: Prisma.TransactionClient) => Promise<T>) {
   return transaction ? action(transaction) : db.$transaction(action, { timeout: 20000 });
 }
@@ -30,7 +31,7 @@ export async function saveProduct(actorId: string, raw: unknown) {
   if (salePriceCents !== null && (priceCents === null || salePriceCents > priceCents)) throw new CommerceError("Preço promocional inválido.");
   const data = {
     name: text(b.name, "Nome", 180), slug: slug(b.slug), sku: text(b.sku, "SKU", 100),
-    description: text(b.description, "Descrição", 10000), shortDescription: text(b.shortDescription, "Resumo", 500, true),
+    description: text(b.description, "Descrição", 10000), shortDescription: productSummary(b.shortDescription),
     mode, categoryId: text(b.categoryId, "Categoria", 100), status: choice(b.status, statuses, "Status"),
     priceCents: mode === "QUOTE_ONLY" ? null : priceCents, salePriceCents: mode === "QUOTE_ONLY" ? null : salePriceCents,
     costCents: money(b.costCents, "Custo"), minimumQuantity: integer(b.minimumQuantity ?? 1, "Mínimo", 1, 10000),
@@ -66,7 +67,14 @@ export async function saveProduct(actorId: string, raw: unknown) {
       await tx.productVariant.updateMany({where:{productId:product.id,...(ids.length?{id:{notIn:ids}}:{})},data:{active:false}});
       for (const variant of variants) await saveVariant(actorId, {...variant, productId:product.id}, tx);
     }
-    if (b.templateDrafts !== undefined) {
+    if(b.personalizationModel!=null&&mode==='CUSTOMIZABLE'){
+      const views=await resolvePersonalizationModel(tx,b.personalizationModel);
+      // Copy a versioned snapshot so existing designs/orders retain their original basis.
+      // All technical settings come from the selected server-side model, never form dimensions.
+      await tx.customizationTemplate.updateMany({where:{productId:product.id,active:true},data:{active:false}});
+      for(const view of views)await saveTemplate(actorId,{productId:product.id,name:view.name,productType:view.productType,baseImageUrl:view.baseImageUrl,maxFileBytes:view.maxFileBytes,variantIds:[],areas:view.areas},tx);
+      await tx.auditLog.create({data:{actorId,entity:'Product',entityId:product.id,action:'SELECT_PERSONALIZATION_MODEL',detail:{sourceViews:views.map(v=>v.id)}}});
+    }else if (b.templateDrafts !== undefined) {
       for (const template of list(b.templateDrafts,"Vistas",10).map(object)) {
         if(data.status==="DRAFT"&&!template.id&&!template.name&&!template.baseImageUrl&&(!Array.isArray(template.areas)||!template.areas.length))continue;
         if (template.id && template.remove === true) {
@@ -97,7 +105,7 @@ export async function saveProduct(actorId: string, raw: unknown) {
         const mockups=await tx.customizationTemplate.findMany({where:{productId:product.id,active:true},include:{areas:true}});
         for(const variant of variants){
           const views=selectVariantMockups(mockups,variant.id);
-          if(!views.length||views.some(view=>!view.baseImageUrl||!view.areas.length||view.areas.some(area=>!area.printWidthMm||!area.printHeightMm||area.width<=0||area.height<=0||area.x<0||area.y<0||area.x+area.width>1||area.y+area.height>1)))throw new CommerceError(`Mockup: configure imagem, área e medidas de impressão para a variante ${variant.name} antes de publicar.`);
+          if(!views.length||views.some(view=>!view.baseImageUrl||!view.areas.length||view.areas.some(area=>!area.printWidthMm||!area.printHeightMm||area.width<=0||area.height<=0||area.x<0||area.y<0||area.x+area.width>1||area.y+area.height>1)))throw new CommerceError(`Modelo de personalização: selecione um modelo completo para a variante ${variant.name} antes de publicar.`);
         }
       }
     }

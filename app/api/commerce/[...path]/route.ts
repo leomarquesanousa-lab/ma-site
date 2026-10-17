@@ -1,4 +1,5 @@
 import { artworkPublicSelect, saveArtwork } from "@/lib/commerce/artwork";
+import {personalizationModels} from '@/lib/commerce/personalization-models';
 import { categorySeo } from "@/lib/commerce/category-seo";
 import { selectVariantMockups } from "@/lib/commerce/mockups";
 import { customerListing } from "@/lib/commerce/customers";
@@ -19,7 +20,7 @@ function privateJson(data: unknown, init?: ResponseInit) {
   return NextResponse.json(data, { ...init, headers });
 }
 type Context = { params: Promise<{ path: string[] }> };
-const adminPermissions: Record<string, Permission> = { production: "orders", artworks: "products", products: "products", categories: "categories", variants: "products", templates: "products", inventory: "inventory", orders: "orders", quotes: "quotes", customers: "customers", settings: "settings", audit: "audit", dashboard: "dashboard" };
+const adminPermissions: Record<string, Permission> = { 'personalization-models':'products', production: "orders", artworks: "products", products: "products", categories: "categories", variants: "products", templates: "products", inventory: "inventory", orders: "orders", quotes: "quotes", customers: "customers", settings: "settings", audit: "audit", dashboard: "dashboard" };
 function fail(error: unknown, request: Request) {
   if (error instanceof CommerceError) return privateJson({ error: error.message }, { status: error.status });
   if (error instanceof Prisma.PrismaClientKnownRequestError && ["P2002", "P2003", "P2025", "P2034"].includes(error.code)) return privateJson({ error: "Conflito de dados. Confira os campos ou recarregue e tente novamente." }, { status: 409 });
@@ -42,6 +43,7 @@ export async function GET(request: Request, context: Context) {
       await requirePermission(permission);
       let result: unknown;
       switch (resource) {
+        case 'personalization-models': result=await personalizationModels(db);break;
         case "production": {
           const item = await db.orderItem.findUnique({where:{id:text(new URL(request.url).searchParams.get("item"),"Item",100)}});
           if(!item)throw new CommerceError("Item inexistente.",404);
