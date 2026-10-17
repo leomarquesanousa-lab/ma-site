@@ -1,4 +1,5 @@
 "use client";
+import BannersWorkspace from "./BannersWorkspace";
 import ArtworkAdmin from "./ArtworkAdmin";
 import CustomersWorkspace from "./CustomersWorkspace";
 import ProductCompositionFields, { editableVariants, editableTemplates } from "./ProductCompositionFields";
@@ -12,11 +13,12 @@ import adminStyles from "@/app/admin/admin.module.css";
 const styles = { ...commerceStyles, ...adminStyles };
 import { StructuredField } from "./StructuredField";
 import CategoryImageField from "./CategoryImageField";
+import navigationStyles from './AdminNavigation.module.css';
 
 type Row = Record<string, unknown>;
 function relatedRows(value: unknown): Row[] { return Array.isArray(value) ? value.filter((item): item is Row => !!item && typeof item === "object" && !Array.isArray(item)) : []; }
 type Field = { key: string; label: string; type?: "text" | "number" | "money" | "textarea" | "json" | "checkbox" | "multi"; options?: { value: string; label: string }[]; required?: boolean; nullable?: boolean; modes?: string[] };
-const labels: Record<string,string> = { dashboard: "Visão geral", products: "Produtos", categories: "Categorias", inventory: "Estoque", orders: "Pedidos", quotes: "Orçamentos", customers: "Clientes", settings: "Configurações", audit: "Auditoria" };
+const labels: Record<string,string> = { dashboard: "Visão geral", products: "Produtos", categories: "Categorias", inventory: "Estoque", orders: "Pedidos", quotes: "Orçamentos", customers: "Clientes", settings: "Configurações", audit: "Auditoria", gallery:"Biblioteca de Artes · Galeria R2", manualArt:"Biblioteca de Artes · Artes manuais" };
 const productFields: Field[] = [
   { key:"name",label:"Nome",required:true },{key:"slug",label:"Slug",required:true},{key:"sku",label:"SKU",required:true},
   {key:"mode",label:"Modalidade",options:[{value:"QUOTE_ONLY",label:"Sob orçamento"},{value:"CUSTOMIZABLE",label:"Personalizável"},{value:"READY_TO_SELL",label:"Pronto para comprar"}]},
@@ -61,19 +63,21 @@ function RecordForm({ title, fields, initial, endpoint, done }: { title:string; 
   </form>;
 }
 export default function AdminWorkspace({ permissions }: { permissions:Permission[] }) {
+  const [homeDirty,setHomeDirty]=useState(false);
   const [tab,setTab]=useState("dashboard"),[data,setData]=useState<unknown>(null),[error,setError]=useState(""),[loading,setLoading]=useState(true),[loadedTab,setLoadedTab]=useState<string|null>(null),[editing,setEditing]=useState<{title:string;initial:Row;fields:Field[];endpoint:string}|null>(null),[categories,setCategories]=useState<Row[]>([]),[filter,setFilter]=useState(""),[refresh,setRefresh]=useState(0),[uploadMessage,setUploadMessage]=useState("");
-  useEffect(()=>{let live=true;if(tab==="customers")return()=>{live=false;};setLoading(true);setError("");commerceRequest(`admin/${tab}`).then(r=>{if(tab!=="dashboard"&&tab!=="settings"&&!Array.isArray(r))throw new Error("Resposta inv?lida ao carregar a listagem.");if(tab==="products"&&(r as Row[]).some(row=>!row||["templates","variants","images","options"].some(key=>!Array.isArray(row[key]))))throw new Error("Produtos com rela??es incompletas. Recarregue; se persistir, verifique a API.");if(live){setData(r);setLoadedTab(tab);}}).catch(e=>{if(live){setError(e.message);setData(null);setLoadedTab(tab);}}).finally(()=>{if(live)setLoading(false);});return()=>{live=false;};},[tab,refresh]);
+  useEffect(()=>{let live=true;if(tab==="customers"||tab==="home"||tab==="gallery"||tab==="manualArt")return()=>{live=false;};setLoading(true);setError("");commerceRequest(`admin/${tab}`).then(r=>{if(tab!=="dashboard"&&tab!=="settings"&&!Array.isArray(r))throw new Error("Resposta inv?lida ao carregar a listagem.");if(tab==="products"&&(r as Row[]).some(row=>!row||["templates","variants","images","options"].some(key=>!Array.isArray(row[key]))))throw new Error("Produtos com rela??es incompletas. Recarregue; se persistir, verifique a API.");if(live){setData(r);setLoadedTab(tab);}}).catch(e=>{if(live){setError(e.message);setData(null);setLoadedTab(tab);}}).finally(()=>{if(live)setLoading(false);});return()=>{live=false;};},[tab,refresh]);
   useEffect(()=>{if(permissions.includes("categories")) commerceRequest<Row[]>("admin/categories").then(setCategories).catch(()=>{});},[permissions,refresh]);
   const done=()=>{setEditing(null);setRefresh(n=>n+1);};
   const categoryFields:Field[]=[{key:"name",label:"Nome",required:true},{key:"slug",label:"Slug",required:true},{key:"description",label:"Descrição",type:"textarea"},{key:"seoTitle",label:"T?tulo SEO"},{key:"seoDescription",label:"Descri??o SEO",type:"textarea"},{key:"imageUrl",label:"Imagem da categoria"},{key:"parentId",label:"Categoria principal",options:[{value:"",label:"Sem principal"},...categories.filter(c=>!c.parentId).map(c=>({value:String(c.id),label:String(c.name)}))]},{key:"active",label:"Ativa",type:"checkbox"},{key:"position",label:"Ordem",type:"number"}];
   const fields=productFields.map(f=>f.key==="categoryId"?{...f,options:categories.map(c=>({value:String(c.id),label:String(c.name)}))}:f);
   const editProduct=(row:Row={})=>setEditing({title:row.id?"Editar produto":"Novo produto",endpoint:"products",fields,initial:{mode:"QUOTE_ONLY",status:"DRAFT",minimumQuantity:1,featured:false,images:[],options:[],...row}});
   const rows=loadedTab===tab?relatedRows(data):[];
-  return <div>
-    <nav className={styles.tabs} aria-label="Módulos administrativos">{permissions.map(p=><button key={p} aria-pressed={tab===p} onClick={()=>{if(editing&&!confirm("Descartar formulário aberto?"))return;setEditing(null);setTab(p);setFilter("");}}>{labels[p]}</button>)}</nav>
-    <header className={styles.moduleHeading}><div><h2>{labels[tab]}</h2><p>{tab==="products"?"Gerencie o catálogo, as variações e a apresentação dos produtos.":tab==="settings"?"Organize as informações e preferências comerciais.":"Acompanhe os dados e as ações deste módulo."}</p></div></header>
-    {permissions.includes("products")&&<details><summary>Biblioteca de artes e modelos licenciados</summary><ArtworkAdmin/></details>}
-    {tab==="customers"?<CustomersWorkspace/>:editing?<RecordForm key={`${editing.endpoint}-${editing.initial.id??"new"}`} {...editing} done={done}/>:<>
+  function navigate(module:string){if((editing||homeDirty)&&!confirm("Descartar formulário aberto?"))return;setEditing(null);setTab(module);setFilter("");}
+  return <div className={navigationStyles.layout}>
+    <nav className={`${styles.tabs} ${navigationStyles.navigation}`} aria-label="Módulos administrativos">{permissions.map(p=><button key={p} aria-pressed={tab===p} onClick={()=>navigate(p)}>{labels[p]}</button>)}{permissions.includes("settings")&&<button aria-pressed={tab==="home"} onClick={()=>navigate("home")}>Home / Banners</button>}{permissions.includes("products")&&<div className={navigationStyles.group} role="group" aria-label="Biblioteca de Artes"><strong>Biblioteca de Artes</strong><button aria-pressed={tab==="gallery"} onClick={()=>navigate("gallery")}>Galeria R2</button><button aria-pressed={tab==="manualArt"} onClick={()=>navigate("manualArt")}>Artes manuais</button></div>}</nav>
+    <div className={navigationStyles.content}>
+    <header className={styles.moduleHeading}><div><h2>{tab==="home"?"Home / Banners":labels[tab]}</h2><p>{tab==="products"?"Gerencie o catálogo, as variações e a apresentação dos produtos.":tab==="settings"?"Organize as informações e preferências comerciais.":"Acompanhe os dados e as ações deste módulo."}</p></div></header>
+    {(tab==="gallery"||tab==="manualArt")&&permissions.includes("products")?<ArtworkAdmin key={tab} mode={tab==="gallery"?"gallery":"manual"}/>:tab==="home"?<BannersWorkspace onDirtyChange={setHomeDirty}/>:tab==="customers"?<CustomersWorkspace/>:editing?<RecordForm key={`${editing.endpoint}-${editing.initial.id??"new"}`} {...editing} done={done}/>:<>
       {error&&<p role="alert" className={styles.error}>{error}</p>}{loading||loadedTab!==tab?<p role="status">Carregando dados reais…</p>:error?null:<>
       {tab==="dashboard"&&data&&<div className={styles.stats}>{Object.entries(data as Row).map(([key,value])=><article key={key}><h2>{({orders:"Pedidos",activeProducts:"Produtos ativos",pendingQuotes:"Orçamentos pendentes",awaitingOrders:"Aguardando atendimento",lowStock:"Estoque baixo",confirmedSalesCents:"Recebimentos confirmados"} as Record<string,string>)[key]}</h2><strong>{key.endsWith("Cents")?moneyLabel(Number(value)):String(value)}</strong></article>)}</div>}
       {tab==="settings"&&<RecordForm title="Configurações comerciais" endpoint="settings" initial={{businessName:"M.A. Confecções e Brindes",orderingEnabled:false,...(data as Row??{})}} fields={[{key:"businessName",label:"Nome comercial",required:true},{key:"contactEmail",label:"E-mail"},{key:"purchasePolicy",label:"Política de compra",type:"textarea"},{key:"orderingEnabled",label:"Receber pedidos (frete e pagamento continuam pendentes de integração)",type:"checkbox"}]} done={()=>setRefresh(n=>n+1)}/>}
@@ -88,5 +92,6 @@ export default function AdminWorkspace({ permissions }: { permissions:Permission
       </>}
       </>}
     </>}
+    </div>
   </div>;
 }

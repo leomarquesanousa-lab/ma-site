@@ -1,0 +1,48 @@
+.workspace { color:#211B1D; }
+.workspace header,.listHeader,.rowActions,.color { display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap; }
+.workspace header { position:sticky;top:0;z-index:2;background:#F7F5F2;padding:12px 0;border-bottom:1px solid #ded5ce;margin-bottom:16px; }
+.workspace h2 { font-size:22px;margin:0; }.workspace p,.workspace small { font-size:13px;line-height:1.6; }.workspace button { border:1px solid #ded5ce;border-radius:7px;padding:8px 12px;background:white;color:#781834;cursor:pointer;font:inherit;font-size:13px; }
+.workspace header>button,.listHeader button { background:#781834;color:white;border-color:#781834; }.workspace button:disabled { opacity:.5;cursor:default; }.workspace :focus-visible { outline:2px solid #B89154;outline-offset:3px; }
+.layout { display:grid;grid-template-columns:minmax(240px,320px) minmax(0,1fr);gap:22px; }.layout>* { min-width:0; }.list { list-style:none;padding:0; }.list li { border:1px solid #ded5ce;border-radius:9px;padding:8px;margin-bottom:8px;background:#fff; }.list li[data-selected=true] { border-color:#B89154;box-shadow:0 0 0 1px #B89154; }
+.select { display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0!important;padding:0!important; }.select img { width:65px;height:48px;object-fit:contain;background:#F7F5F2;border-radius:5px; }.select strong,.select small { display:block;overflow-wrap:anywhere; }.rowActions { justify-content:flex-start;margin-top:8px; }.rowActions button { padding:5px 8px;font-size:12px; }
+.form { display:grid;grid-template-columns:1fr 1fr;gap:12px;border:1px solid #ded5ce;padding:16px;border-radius:10px;background:#fff;min-width:0; }.form legend { font-weight:600;padding:0 6px; }.form label { display:flex;flex-direction:column;gap:5px;font-size:13px;min-width:0; }.form input:not([type=checkbox]):not([type=color]),.form textarea,.form select { width:100%;min-width:0;box-sizing:border-box;border:1px solid #ded5ce;border-radius:6px;padding:9px;font:inherit;background:#fff; }.wide { grid-column:1/-1; }.check { flex-direction:row!important;align-items:center; }.color { justify-content:flex-start; }.color input { width:40px;height:34px;border:0;padding:0; }
+.preview { margin-top:18px;padding:22px;border-radius:12px;background:#211B1D;color:#F7F5F2;display:grid;grid-template-columns:1fr 1fr;gap:18px;overflow:hidden; }.preview h3 { font-size:clamp(20px,2vw,32px);line-height:1.2;margin-top:0; }.preview img { width:100%;height:240px;object-fit:contain;border-radius:10px; }.previewButton { display:inline-block;background:#781834;color:white;border:1px solid #B89154;border-radius:6px;padding:9px 12px; }.preview small { display:block;margin-top:12px;overflow-wrap:anywhere; }.error { color:#781834;border-left:3px solid #781834;padding:10px; }.notice { background:#f5ecd9;padding:12px;border-radius:7px; }
+@media(max-width:900px){.layout{grid-template-columns:1fr}.list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:8px}.list li{margin:0}.workspace header{position:static}}
+@media(max-width:580px){.form,.preview{grid-template-columns:1fr}.wide{grid-column:auto}.preview img{height:190px}}
+/* Scoped overrides keep the shared admin theme from turning every action into a primary button. */
+.workspace.workspace { width:100%; min-width:0; }
+.workspace.workspace button { min-height:34px; padding:7px 10px; background:#fff; color:#55464b; border:1px solid #e2dadd; font-size:12px; line-height:1.3; box-shadow:none; }
+.workspace.workspace button:hover:not(:disabled) { background:#f6f1ef; border-color:#b89154; }
+.workspace.workspace button:disabled { opacity:.5; cursor:not-allowed; }
+.workspace.workspace .primary { background:#781834; border-color:#781834; color:#fff; }
+.workspace.workspace .primary:hover:not(:disabled) { background:#501020; }
+.workspace.workspace header { gap:12px; padding:12px 0; }
+.actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.actions small { color:#78666d; }
+.layout { grid-template-columns:minmax(220px,290px) minmax(0,1fr); gap:20px; align-items:start; }
+.listHeader strong { font-size:13px; }
+.list { margin:12px 0; display:grid; gap:6px; }
+.list li { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:6px; padding:8px; margin:0; border-color:#e9e2e4; }
+.list li[data-selected=true] { background:#fbf7f5; border-color:#b89154; box-shadow:none; }
+.workspace.workspace .select { justify-content:flex-start; background:transparent; border:0; border-radius:4px; gap:9px; min-width:0; }
+.select img { width:48px; height:42px; flex-shrink:0; }
+.select>span { min-width:0; }
+.select strong { font-size:12px; font-weight:600; }
+.select small { font-size:11px; color:#78666d; }
+.rowActions { display:grid; gap:2px; margin:0; }
+.workspace.workspace .rowActions>button { min-height:24px; min-width:26px; padding:2px 5px; border:0; background:transparent; }
+.options { position:relative; }
+.options summary { cursor:pointer; list-style:none; text-align:center; padding:2px 4px; font-size:13px; border-radius:4px; }
+.options summary::-webkit-details-marker { display:none; }
+.options[open]>div { position:absolute; right:0; top:100%; z-index:5; width:128px; display:grid; gap:4px; padding:6px; background:white; border:1px solid #ded5ce; border-radius:8px; box-shadow:0 5px 16px #211b1d1a; }
+.form { border:0; border-radius:0; padding:0; background:transparent; gap:12px; margin:0; }
+.form legend { padding:0 0 8px; font-size:17px; }
+.sectionTitle { grid-column:1/-1; font-size:12px; color:#781834; margin:10px 0 0; padding-top:12px; border-top:1px solid #e9e2e4; letter-spacing:.025em; }
+.workspace.workspace .form input:not([type=checkbox]):not([type=color]),.workspace.workspace .form select,.workspace.workspace .form textarea { min-height:38px; padding:8px 10px; font-size:13px; border-color:#e2dadd; border-radius:7px; }
+.workspace.workspace .form input[type=color] { width:38px; min-height:32px; padding:2px; }
+.previewTitle { margin:24px 0 8px; font-size:13px; }
+.preview { margin-top:0; padding:18px; }
+.preview img { height:200px; }
+.preview small { font-size:11px; }
+@media(max-width:900px){.layout{grid-template-columns:1fr}.list{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}.workspace.workspace header{position:sticky}.preview img{height:180px}}
+@media(max-width:580px){.actions{width:100%}.actions small{flex-basis:100%}.actions .primary{margin-left:auto}.list{grid-template-columns:1fr}.preview{padding:14px}.preview img{height:160px}.workspace.workspace header{top:0}.form{grid-template-columns:1fr}}

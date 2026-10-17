@@ -9,7 +9,8 @@ import { db } from "@/lib/db";
 import { CommerceError, requirePermission, requireUser, sameOrigin, type Permission } from "@/lib/commerce/auth";
 import { saveCategory, saveProduct, saveTemplate, saveVariant } from "@/lib/commerce/admin";
 import { activeProductWhere, addCart, cartFor, changeOrder, placeOrder } from "@/lib/commerce/service";
-import { boundedBody } from "@/lib/commerce/storage";
+import { assetStorage, boundedBody, imageMime, validateImageContent } from "@/lib/commerce/storage";
+import sharp from 'sharp';
 import { choice, composition, flag, integer, object, text } from "@/lib/commerce/validation";
 
 function privateJson(data: unknown, init?: ResponseInit) {
@@ -49,7 +50,7 @@ export async function GET(request: Request, context: Context) {
           const originals=composition.filter(e=>e&&typeof e==='object'&&!Array.isArray(e)&&e.type==='image').map(e=>{const element=object(e);return {elementId:element.id,url:element.sourceAssetId?'/api/arquivos/'+element.sourceAssetId:element.value};});
           return privateJson({orderId:item.orderId,itemId:item.id,originals,exportStatus:"PENDING_INDUSTRIAL_VALIDATION",snapshot:item.snapshot},{headers:{"Content-Disposition":'attachment; filename="producao-'+item.id+'.json"'}});
         }
-        case "artworks": result = await db.artwork.findMany({ orderBy: { updatedAt: "desc" }, take: 200 }); break;
+        case "artworks": result = await db.artwork.findMany({where:{NOT:{id:{startsWith:'r2lib_'}}}, orderBy: { updatedAt: "desc" }, take: 200 }); break;
         case "products": result = await db.product.findMany({ where: { deletedAt: null }, include: { category: true, images: { orderBy: { position: "asc" } }, variants: true, options: true, templates: { include: { areas: true } } }, orderBy: { updatedAt: "desc" }, take: 200 }); break;
         case "categories": result = await Promise.all((await db.category.findMany({ orderBy: { position: "asc" } })).map(async category => ({ ...category, ...await categorySeo(category.id) }))); break;
         case "inventory": result = await db.productVariant.findMany({ include: { product: { select: { name: true } }, movements: { orderBy: { createdAt: "desc" }, take: 30 } }, take: 200 }); break;
@@ -194,6 +195,11 @@ export async function POST(request: Request, context: Context) {
           const asset=await db.storedAsset.findFirst({where:{id:element.sourceAssetId,public:false,...(!element.artworkId?{ownerId:user.id}:{}),bytes:{lte:view.maxFileBytes}}});
           if(!asset)throw new CommerceError("Arquivo não autorizado ou excede o limite.");
           element.pixelWidth=asset.pixelWidth??undefined; element.pixelHeight=asset.pixelHeight??undefined;
+          if(asset.storageKey.startsWith('r2art:')){
+            const bytes=await assetStorage.get(asset.storageKey),mime=imageMime(bytes);await validateImageContent(bytes,mime);
+            const metadata=await sharp(Buffer.from(bytes)).metadata(),swap=(metadata.orientation??0)>=5;
+            element.pixelWidth=swap?metadata.height:metadata.width;element.pixelHeight=swap?metadata.width:metadata.height;
+          }
         }
       }
       for(const lock of requiredLocked)if(!elements.some(e=>e.artworkId===lock.artworkId&&e.areaId===lock.areaId&&e.presetIndex===lock.index&&e.type==='text'))throw new CommerceError("O modelo exige suas camadas bloqueadas.");

@@ -16,9 +16,11 @@ export async function POST(request: Request) {
     const productId = form.get("productId");
     if (productId && (typeof productId !== "string" || !isPublic || !await db.product.findFirst({ where: { id: productId, deletedAt: null }, select: { id: true } }))) throw new CommerceError("Produto inválido.");
     if (!(file instanceof File) || !file.size || file.size > 5242880) throw new CommerceError("Limite de arquivo: 5 MB.");
-    if (await db.storedAsset.count({ where: { ownerId: user.id } }) > (purpose === "artwork" ? 498 : 499)) throw new CommerceError("Limite de arquivos atingido. Contate a loja.", 429);
-    if (await db.storedAsset.count({ where: { ownerId: user.id, createdAt: { gt: new Date(Date.now() - 60000) } } }) >= 10) throw new CommerceError("Aguarde um minuto antes de enviar mais imagens.", 429);
-    const quota = await db.storedAsset.aggregate({ where: { ownerId: user.id }, _sum: { bytes: true } });
+    // Imported R2 references are not uploads by this user and consume no local upload quota.
+    const ownedUploads={ownerId:user.id,NOT:[{storageKey:{startsWith:'r2art:'}},{storageKey:{startsWith:'r2thumb:'}}]};
+    if (await db.storedAsset.count({ where: ownedUploads }) > (purpose === "artwork" ? 498 : 499)) throw new CommerceError("Limite de arquivos atingido. Contate a loja.", 429);
+    if (await db.storedAsset.count({ where: { ...ownedUploads, createdAt: { gt: new Date(Date.now() - 60000) } } }) >= 10) throw new CommerceError("Aguarde um minuto antes de enviar mais imagens.", 429);
+    const quota = await db.storedAsset.aggregate({ where: ownedUploads, _sum: { bytes: true } });
     if ((quota._sum.bytes ?? 0) + file.size > 104857600) throw new CommerceError("Limite de armazenamento de 100 MB atingido. Contate a loja.", 429);
     const data = new Uint8Array(await file.arrayBuffer()), mime = await validateImageContent(data, file.type);
     const metadata = await sharp(data).metadata();

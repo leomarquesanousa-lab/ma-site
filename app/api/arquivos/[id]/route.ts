@@ -6,6 +6,14 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   try {
     const asset = await db.storedAsset.findUnique({ where: { id: (await params).id } });
     if (!asset) return new Response(null, { status: 404 });
+    let publicAsset=asset.public;
+    if(asset.storageKey.startsWith('r2thumb:'))publicAsset=false;
+    if(asset.storageKey.startsWith('r2thumb:')&&!await db.artwork.findFirst({where:{thumbnailAssetId:asset.id,active:true},select:{id:true}})){
+      const user=await currentUser();
+      if(!user||user.mustChangePassword)return new Response(null,{status:404});
+      if(!allowed(user.role,'products')&&!await db.customerDesign.findFirst({where:{userId:user.id,composition:{array_contains:[{value:`/api/arquivos/${asset.id}`}] }},select:{id:true}}))return new Response(null,{status:404});
+      publicAsset=false;
+    }
     if (!asset.public) {
       const user = await currentUser();
       if (!user || user.mustChangePassword) return new Response(null, { status: 404 });
@@ -19,6 +27,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       }
     }
     const bytes = await assetStorage.get(asset.storageKey);
-    return new Response(new Uint8Array(bytes), { headers: { "Content-Type": asset.mime, "X-Content-Type-Options": "nosniff", "Content-Disposition": "inline", "Cache-Control": asset.public ? "public, max-age=3600" : "private, no-store", "Content-Security-Policy": "default-src 'none'; sandbox" } });
+    return new Response(new Uint8Array(bytes), { headers: { "Content-Type": asset.mime, "X-Content-Type-Options": "nosniff", "Content-Disposition": "inline", "Cache-Control": publicAsset ? "public, max-age=3600" : "private, no-store", "Content-Security-Policy": "default-src 'none'; sandbox" } });
   } catch { return new Response(null, { status: 404 }); }
 }

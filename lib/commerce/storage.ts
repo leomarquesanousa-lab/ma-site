@@ -4,6 +4,8 @@ import path from "node:path";
 import { CommerceError } from "./errors";
 import { r2Request } from "./r2";
 import sharp from "sharp";
+import { readLibraryAsset } from './r2-library-source';
+import { createHash } from 'node:crypto';
 const root = path.join(process.cwd(), ".ma-storage");
 type UploadContext = { mime: string; public: boolean; ownerId: string; productId?: string; purpose: string };
 export interface AssetStorage { put(bytes: Uint8Array, context: UploadContext): Promise<string>; get(key: string): Promise<Uint8Array>; }
@@ -22,6 +24,14 @@ export const assetStorage: AssetStorage = {
     await mkdir(root, { recursive: true }); const key = randomUUID(); await writeFile(path.join(root, key), bytes, { flag: "wx", mode: 0o600 }); return key;
   },
   async get(key) {
+    if(key.startsWith('r2art:'))return readLibraryAsset(key);
+    if(key.startsWith('r2thumb:')){
+      const cacheDir=path.join(root,'library-previews'),file=path.join(cacheDir,createHash('sha256').update(key).digest('hex')+'.webp');
+      try{return new Uint8Array(await readFile(file));}catch(e){if((e as NodeJS.ErrnoException).code!=='ENOENT')throw e;}
+      const data=await readLibraryAsset(key),mime=imageMime(data);await validateImageContent(data,mime);
+      const thumbnail=await sharp(data,{limitInputPixels:40000000}).rotate().resize({width:640,height:640,fit:'inside',withoutEnlargement:true}).webp().toBuffer();
+      await mkdir(cacheDir,{recursive:true});await writeFile(file,thumbnail,{mode:0o600});return new Uint8Array(thumbnail);
+    }
     if (key.startsWith("r2:")) return new Uint8Array(await (await r2Request("GET", key.slice(3))).arrayBuffer());
     if (!/^[0-9a-f-]{36}$/.test(key)) throw new CommerceError("Arquivo inexistente.", 404); return readFile(path.join(root, key));
   },

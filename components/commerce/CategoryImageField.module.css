@@ -15,4 +15,10 @@
 .field small { color: #635859; line-height: 1.5; }
 .preview { width: 100%; height: 180px; object-fit: contain; border: 1px solid #e3d9d7; border-radius: 10px; background: #f7f5f2; }
 .error { color: #801c2d; background: #fff0f2; padding: 12px; border: 1px solid #a52a38; border-radius: 6px; margin: 0; overflow-wrap: anywhere; }
+.compact { gap: 8px; }
+.compact .dropZone { grid-template-columns: auto 1fr auto; align-items: center; padding: 12px; gap: 8px; text-align: left; }
+.compact .dropZone small { grid-column: 2 / -1; }
+.compact .preview { height: 140px; }
+.compact .dropZone[data-dragging=true] { padding: 11px; }
+@media(max-width:580px) { .compact .dropZone { grid-template-columns: auto 1fr; }.compact .dropZone button { grid-column: 1 / -1; }.compact .dropZone small { grid-column: 1 / -1; } }
 @media (prefers-reduced-motion: reduce) { .dropZone { transition: none; } }

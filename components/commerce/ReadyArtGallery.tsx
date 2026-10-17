@@ -1,0 +1,16 @@
+"use client";
+import {useEffect,useState} from 'react';
+import styles from '@/app/commerce.module.css';
+export type GalleryArt={id:string;name:string;category:string;subcategory:string;tags:string[];compatibleTypes:string[];thumbnailAssetId:string;preset:{text:string;locked:boolean}[]|null};
+type Result={items:GalleryArt[];total:number;groups:{category:string;subcategory:string}[];hasMore:boolean};
+export default function ReadyArtGallery({productType,maxFileBytes,selected,disabled,onSelect}:{productType:string;maxFileBytes:number;selected?:string;disabled:boolean;onSelect:(art:GalleryArt)=>void}){
+ const [query,setQuery]=useState(''),[category,setCategory]=useState(''),[subcategory,setSubcategory]=useState(''),[page,setPage]=useState(0),[result,setResult]=useState<Result|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('');
+ useEffect(()=>{setCategory('');setSubcategory('');setPage(0);setResult(null);},[productType]);
+ useEffect(()=>{
+  const abort=new AbortController();const timer=setTimeout(async()=>{setBusy(true);setError('');try{const params=new URLSearchParams({type:productType,maxBytes:String(maxFileBytes),q:query,category,subcategory,page:String(page)}),r=await fetch('/api/art-library?'+params,{cache:'no-store',signal:abort.signal}),data=await r.json();if(!r.ok)throw Error(data.error);if(!abort.signal.aborted)setResult(data);}catch(e){if(!abort.signal.aborted){setResult(null);setError(e instanceof Error?e.message:'Biblioteca indisponível.');}}finally{if(!abort.signal.aborted)setBusy(false);}},250);
+  return()=>{clearTimeout(timer);abort.abort();};
+ },[productType,maxFileBytes,query,category,subcategory,page]);
+ const categories=[...new Set(result?.groups.map(g=>g.category)??[])],subcategories=[...new Set(result?.groups.filter(g=>g.category===category&&g.subcategory).map(g=>g.subcategory)??[])];
+ return <div aria-busy={busy}><label>Buscar arte<input value={query} placeholder="Nome da arte" onChange={e=>{setQuery(e.target.value);setPage(0);}}/></label><label>Tema<select value={category} onChange={e=>{setCategory(e.target.value);setSubcategory('');setPage(0);}}><option value="">Todos os temas</option>{categories.map(c=><option key={c}>{c}</option>)}</select></label>{category&&subcategories.length>0&&<label>Subtema<select value={subcategory} onChange={e=>{setSubcategory(e.target.value);setPage(0);}}><option value="">Todos os subtemas</option>{subcategories.map(c=><option key={c}>{c}</option>)}</select></label>}
+ {error&&<p role="alert">{error}</p>}<p role="status">{busy?'Carregando artes…':result?`${result.total} artes disponíveis`:''}</p><div className={styles.artGrid}>{result?.items.map(art=><button key={art.id} type="button" aria-pressed={selected===art.id} disabled={disabled||busy} onClick={()=>onSelect(art)}><img src={'/api/arquivos/'+art.thumbnailAssetId} alt="" loading="lazy"/><span>{art.name}{selected===art.id?' · Aplicada':''}</span></button>)}</div>{result?.total===0&&<p>Nenhuma arte compatível disponível. A loja pode configurar a biblioteca.</p>}<div className={styles.actions}><button type="button" disabled={busy||page===0} onClick={()=>setPage(p=>p-1)}>Anterior</button><small>Página {page+1}</small><button type="button" disabled={busy||!result?.hasMore} onClick={()=>setPage(p=>p+1)}>Próxima</button></div></div>;
+}

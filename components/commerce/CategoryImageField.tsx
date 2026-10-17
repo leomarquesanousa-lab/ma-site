@@ -1,11 +1,11 @@
 ﻿"use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { categoryImageUrl } from "@/lib/commerce/validation";
 import { uploadImage } from "./client";
 import styles from "./CategoryImageField.module.css";
 
-export default function CategoryImageField({ value, onChange, onUploadStateChange, disabled = false, purpose = "catalog", productId, showPreview = true }: {
+export default function CategoryImageField({ value, onChange, onUploadStateChange, disabled = false, purpose = "catalog", productId, showPreview = true, compact = false }: {
   value: unknown;
   onChange: (value: string) => void;
   onUploadStateChange: (busy: boolean) => void;
@@ -13,6 +13,7 @@ export default function CategoryImageField({ value, onChange, onUploadStateChang
   purpose?: "catalog" | "mockup";
   productId?: string;
   showPreview?: boolean;
+  compact?: boolean;
 }) {
   const id = useId();
   const [busy, setBusy] = useState(false);
@@ -22,6 +23,8 @@ export default function CategoryImageField({ value, onChange, onUploadStateChang
   const [failedUrl, setFailedUrl] = useState("");
   const [showUrl, setShowUrl] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
+  const [pendingPreview, setPendingPreview] = useState("");
+  useEffect(() => () => { if (pendingPreview) URL.revokeObjectURL(pendingPreview); }, [pendingPreview]);
   const fileInput = useRef<HTMLInputElement>(null);
   const inFlight = useRef(false);
   const dragDepth = useRef(0);
@@ -42,6 +45,7 @@ export default function CategoryImageField({ value, onChange, onUploadStateChang
       setError("Selecione uma imagem PNG, JPEG ou WebP de até 5 MB."); return;
     }
     inFlight.current = true; setBusy(true); onUploadStateChange(true);
+    setPendingPreview(URL.createObjectURL(file));
     setProgress(null); setStatus("Enviando imagem…");
     try {
       const asset = await uploadImage(file, purpose, productId, percent => {
@@ -49,23 +53,23 @@ export default function CategoryImageField({ value, onChange, onUploadStateChang
         setStatus(percent === 100 ? "Arquivo enviado. Confirmando armazenamento…" : "Enviando imagem…");
       });
       onChange(asset.url); setFailedUrl("");
-      setStatus(purpose === "mockup" ? "Mockup enviado. Salve o produto para aplicar." : "Imagem enviada. Salve a categoria para aplicar.");
+      setStatus(purpose === "mockup" ? "Mockup enviado. Salve o produto para aplicar." : "Imagem enviada. Salve as alterações para aplicar.");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Não foi possível enviar. Tente novamente."); setStatus("");
     } finally {
-      inFlight.current = false; setBusy(false); onUploadStateChange(false);
+      setPendingPreview(""); inFlight.current = false; setBusy(false); onUploadStateChange(false);
     }
   }
 
-  return <div className={styles.field} aria-busy={busy}>
-    <div className={styles.dropZone} data-dragging={dragging} data-disabled={locked} role="group" aria-label={purpose === "mockup" ? "Enviar imagem-base de personalização" : "Enviar imagem da categoria"}
+  return <div className={`${styles.field} ${compact ? styles.compact : ""}`} aria-busy={busy}>
+    <div className={styles.dropZone} data-dragging={dragging} data-disabled={locked} role="group" aria-label={purpose === "mockup" ? "Enviar imagem-base de personalização" : "Enviar imagem"}
       onDragEnter={event => { event.preventDefault(); if (!locked && event.dataTransfer.types.includes("Files")) { dragDepth.current++; setDragging(true); } }}
       onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect = locked ? "none" : "copy"; }}
       onDragLeave={event => { event.preventDefault(); if (--dragDepth.current <= 0) { dragDepth.current = 0; setDragging(false); } }}
       onDrop={event => { event.preventDefault(); event.stopPropagation(); dragDepth.current = 0; setDragging(false); void upload(Array.from(event.dataTransfer.files)); }}>
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 15v6h16v-6" /></svg>
       <strong>{busy ? "Enviando imagem…" : dragging ? "Solte a imagem aqui" : "Arraste e solte sua imagem"}</strong>
-      <button type="button" disabled={locked} onClick={() => fileInput.current?.click()}>{current ? "Substituir imagem / Escolher arquivo" : "Escolher arquivo"}</button>
+      <button type="button" disabled={locked} onClick={() => fileInput.current?.click()}>{current ? (compact ? "Alterar imagem" : "Substituir imagem / Escolher arquivo") : "Escolher arquivo"}</button>
       <input ref={fileInput} hidden id={`${id}-file`} type="file" accept="image/png,image/jpeg,image/webp" disabled={locked} aria-label={purpose === "mockup" ? "Escolher imagem-base" : "Escolher imagem da categoria"} aria-describedby={`${id}-help`}
         onChange={event => { const files = Array.from(event.target.files ?? []); event.target.value = ""; void upload(files); }} />
       <small id={`${id}-help`}>PNG, JPEG ou WebP • até 5 MB</small>
@@ -80,7 +84,7 @@ export default function CategoryImageField({ value, onChange, onUploadStateChang
     <small id={`${id}-url-help`}>Uploads preenchem este campo automaticamente. Imagens externas dependem do site de origem.</small>
     </div>
     {urlError && <p id={`${id}-url-error`} className={styles.error} role="alert">{urlError}</p>}
-    {showPreview && preview && failedUrl !== preview && <img key={preview} className={styles.preview} src={preview} alt={purpose === "mockup" ? "Prévia da imagem-base" : "Prévia da imagem da categoria"} referrerPolicy="no-referrer" onError={() => setFailedUrl(preview)} />}
+    {showPreview && (pendingPreview || (preview && failedUrl !== preview)) && <img key={pendingPreview || preview} className={styles.preview} src={pendingPreview || preview} alt={purpose === "mockup" ? "Prévia da imagem-base" : "Prévia da imagem selecionada"} referrerPolicy="no-referrer" onError={() => { if (!pendingPreview) setFailedUrl(preview); }} />}
     {preview && failedUrl === preview && <p className={styles.error} role="alert">Não foi possível carregar a prévia. Confira a URL e se o site permite exibir a imagem.</p>}
     {current && <button type="button" disabled={locked} onClick={() => { onChange(""); setFailedUrl(""); setError(""); setStatus("Imagem desvinculada. Salve o cadastro para aplicar."); }}>Remover imagem</button>}
     <small>A imagem anterior só é substituída ao salvar o cadastro. Remover não apaga o arquivo armazenado.</small>

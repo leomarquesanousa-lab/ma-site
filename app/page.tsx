@@ -1,3 +1,5 @@
+import { homeBanners } from "@/lib/home/service";
+import Image from "next/image";
 import HeroCarousel from "@/components/HeroCarousel";
 import styles from "./premium.module.css";
 
@@ -5,10 +7,12 @@ import { collectionUrl, collections, whatsapp as contact } from "./collections";
 import { Arrow, CommerceFooter, ContactBanner } from "@/components/CommercePresentation";
 import FeaturedProducts from "@/components/commerce/FeaturedProducts";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+export default async function Home() {
+  const { banners } = await homeBanners();
   return (
     <main id="conteudo" className={styles.home}>
-      <HeroCarousel />
+      <HeroCarousel banners={banners.filter(b=>b.active)} />
 
       <section className={styles.trust} aria-label="Nossa proposta">
         <div className={`${styles.container} ${styles.trustGrid}`}>
@@ -35,7 +39,7 @@ export default function Home() {
 
       <section className={styles.uniformSection} id="uniformes">
         <div className={`${styles.container} ${styles.uniformGrid}`}>
-          <div className={styles.uniformPhoto}><img src="/confecoes-card111.jpg" alt="Detalhes de polo e jaqueta com marca ilustrativa aplicada" loading="lazy" /><span>Uniformes profissionais / M.A.</span></div>
+          <div className={styles.uniformPhoto}><Image className={styles.uniformInstitutionalImage} src="/hero-banner-uniformes.png" alt="Profissionais com uniformes em uma composição institucional da M.A. Confecções" fill sizes="(max-width: 900px) 100vw, 50vw" /><span>Uniformes profissionais / M.A.</span></div>
           <div className={styles.uniformCopy}><span className={styles.eyebrow}>O centro do nosso trabalho</span><h2>Vista a identidade<br />da sua empresa.</h2><p>Uma equipe bem apresentada comunica cuidado antes mesmo da primeira conversa. Vamos pensar nos uniformes da sua empresa a partir da sua marca e da sua necessidade. Atendimento exclusivamente sob orçamento, sem compra direta.</p><div className={styles.uniformList}><div><span>01</span><strong><a href="/colecoes/uniformes/polos">Polos profissionais</a></strong><p>Uma apresentação alinhada à sua identidade.</p></div><div><span>02</span><strong><a href="/colecoes/uniformes/camisetas">Camisetas para equipes</a></strong><p>Converse sobre modelos e possibilidades.</p></div><div><span>03</span><strong><a href="/colecoes/uniformes/jaquetas">Jaquetas personalizadas</a></strong><p>Conte o que precisa e fale com a M.A.</p></div></div><a className={styles.button} href={contact} target="_blank" rel="noopener noreferrer">Orçar uniformes pelo WhatsApp <Arrow /></a><a className={styles.textLink} href="/colecoes/uniformes">Conhecer as linhas de uniformes <Arrow /></a></div>
         </div>
       </section>

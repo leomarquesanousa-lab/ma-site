@@ -374,6 +374,13 @@ model PaymentRecord {
   createdAt DateTime @default(now())
   @@index([orderId])
 }
+model HomeContent {
+  id String @id @default("home")
+  banners Json
+  revision Int @default(1)
+  updatedAt DateTime @updatedAt
+}
+
 model StoreSettings {
   id String @id @default("store")
   businessName String @default("M.A. Confecções e Brindes")
